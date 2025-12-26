@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H8wiUhZG5ds=",
+  "dgSpecHash": "4XVq7u3KSwg=",
   "success": true,
-  "projectFilePath": "/Users/aliniacob/Documents/facultate/DAW/Folder_Docker/OnlineShop 2/OnlineShop.csproj",
+  "projectFilePath": "/Users/aliniacob/Documents/Projects/OnlineShop/OnlineShop.csproj",
   "expectedPackageFiles": [
     "/Users/aliniacob/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/Users/aliniacob/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",

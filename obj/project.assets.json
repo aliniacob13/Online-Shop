@@ -8210,11 +8210,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/aliniacob/Documents/facultate/DAW/Folder_Docker/OnlineShop 2/OnlineShop.csproj",
+      "projectUniqueName": "/Users/aliniacob/Documents/Projects/OnlineShop/OnlineShop.csproj",
       "projectName": "OnlineShop",
-      "projectPath": "/Users/aliniacob/Documents/facultate/DAW/Folder_Docker/OnlineShop 2/OnlineShop.csproj",
+      "projectPath": "/Users/aliniacob/Documents/Projects/OnlineShop/OnlineShop.csproj",
       "packagesPath": "/Users/aliniacob/.nuget/packages/",
-      "outputPath": "/Users/aliniacob/Documents/facultate/DAW/Folder_Docker/OnlineShop 2/obj/",
+      "outputPath": "/Users/aliniacob/Documents/Projects/OnlineShop/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/aliniacob/.nuget/NuGet/NuGet.Config"

@@ -136,66 +136,82 @@ public class ProductsController : Controller
     //am pus parametru nullable categoryId pentru ca
     //utilizatorul sa poata filtra produsele in functie de categorie
     [AllowAnonymous]
-    public async Task<IActionResult> Index(int? categoryId, string searchString, int page = 1)
+public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? searchString, string? sortarePret, int page = 1)
+{
+    int perPage = 6;
+    if (page < 1) page = 1;
+
+    // Lista de categorii pentru sidebar
+    var categorii = await db.Categories
+        .OrderBy(c => c.Name)
+        .ToListAsync();
+    ViewBag.Categorii = categorii;
+
+    categoriiSelectate ??= new List<int>();
+    ViewBag.CategoriiSelectate = categoriiSelectate;
+    ViewBag.SearchString = searchString;
+    ViewBag.SortarePret = sortarePret;
+
+    var produseQuery = db.Products
+        .Where(p => p.Status == ProductStatus.Approved)
+        .Include(p => p.Category)
+        .Include(p => p.Reviews)
+        .AsQueryable();
+
+    // Filtru multi-categorii
+    if (categoriiSelectate.Any())
     {
-        int perPage = 6;
-        if (page < 1) page = 1;
-
-        // Pregatim query-ul de produse
-        var produseQuery = db.Products
-            .Where(a => a.Status == ProductStatus.Approved)
-            .Include(a => a.Category)
-            .Include(a => a.Reviews)
-            .AsQueryable();
-
-        // Dacă avem un categoryId, filtrăm
-        if (categoryId.HasValue)
-        {
-            produseQuery = produseQuery.Where(p => p.CategoryId == categoryId.Value);
-
-            var category = await db.Categories.FindAsync(categoryId.Value);
-            ViewBag.CategoryName = category?.Name ?? "Categorie necunoscută";
-        }
-        else
-        {
-            ViewBag.CategoryName = "Toate produsele";
-        }
-
-        // Filtrare după denumire (căutare parțială)
-        if (!string.IsNullOrEmpty(searchString))
-        {
-            produseQuery = produseQuery.Where(p => EF.Functions.Like(p.Title, $"%{searchString}%"));
-        }
-
-        ViewBag.SearchString = searchString;
-
-        // Total produse (după filtre)
-        int totalItems = await produseQuery.CountAsync();
-
-        // Ultima pagină
-        int lastPage = (int)Math.Ceiling(totalItems / (double)perPage);
-        if (lastPage < 1) lastPage = 1;
-        if (page > lastPage) page = lastPage;
-
-        int offset = (page - 1) * perPage;
-
-        // Important: ordonare stabilă pentru paginare
-        var produsePagina = await produseQuery
-            .OrderBy(p => p.Id)
-            .Skip(offset)
-            .Take(perPage)
-            .ToListAsync();
-
-        ViewBag.lastPage = lastPage;
-        ViewBag.CurrentPage = page;
-
-        // Base URL care păstrează categoryId + searchString, apoi adaugă page=
-        var baseUrl = Url.Action("Index", "Products", new { categoryId = categoryId, searchString = searchString }) ?? "/Products/Index";
-        var separator = baseUrl.Contains("?") ? "&" : "?";
-        ViewBag.PaginationBaseUrl = baseUrl + separator + "page=";
-
-        return View(produsePagina);
+        produseQuery = produseQuery.Where(p => categoriiSelectate.Contains(p.CategoryId));
+        ViewBag.CategoryName = "Categorii selectate";
     }
+    else
+    {
+        ViewBag.CategoryName = "Toate produsele";
+    }
+
+    // Căutare
+    if (!string.IsNullOrWhiteSpace(searchString))
+    {
+        produseQuery = produseQuery.Where(p => EF.Functions.Like(p.Title, $"%{searchString}%"));
+    }
+
+    // Sortare pret
+    if (sortarePret == "crescator")
+        produseQuery = produseQuery.OrderBy(p => p.Price).ThenBy(p => p.Id);
+    else if (sortarePret == "descrescator")
+        produseQuery = produseQuery.OrderByDescending(p => p.Price).ThenBy(p => p.Id);
+    else
+        produseQuery = produseQuery.OrderBy(p => p.Id); // fallback stabil
+
+    // Paginare
+    int totalItems = await produseQuery.CountAsync();
+    int lastPage = (int)Math.Ceiling(totalItems / (double)perPage);
+    if (lastPage < 1) lastPage = 1;
+    if (page > lastPage) page = lastPage;
+
+    int offset = (page - 1) * perPage;
+
+    var produsePagina = await produseQuery
+        .Skip(offset)
+        .Take(perPage)
+        .ToListAsync();
+
+    ViewBag.lastPage = lastPage;
+    ViewBag.CurrentPage = page;
+
+    // Base URL pentru paginare care păstrează filtrele
+    var baseUrl = Url.Action("Index", "Products", new
+    {
+        categoriiSelectate = categoriiSelectate,
+        searchString = searchString,
+        sortarePret = sortarePret
+    }) ?? "/Products/Index";
+
+    var separator = baseUrl.Contains("?") ? "&" : "?";
+    ViewBag.PaginationBaseUrl = baseUrl + separator + "page=";
+
+    return View(produsePagina);
+}
 
 
 
