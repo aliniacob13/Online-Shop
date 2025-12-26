@@ -176,12 +176,31 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
     }
 
     // Sortare pret
-    if (sortarePret == "crescator")
+    // Sortare (pret / rating)
+    if (sortarePret == "pret_crescator")
+    {
         produseQuery = produseQuery.OrderBy(p => p.Price).ThenBy(p => p.Id);
-    else if (sortarePret == "descrescator")
+    }
+    else if (sortarePret == "pret_descrescator")
+    {
         produseQuery = produseQuery.OrderByDescending(p => p.Price).ThenBy(p => p.Id);
+    }
+    else if (sortarePret == "rating_crescator")
+    {
+        produseQuery = produseQuery
+            .OrderBy(p => p.Reviews.Where(r => r.Rating.HasValue).Select(r => (double?)r.Rating.Value).Average() ?? 0)
+            .ThenBy(p => p.Id);
+    }
+    else if (sortarePret == "rating_descrescator")
+    {
+        produseQuery = produseQuery
+            .OrderByDescending(p => p.Reviews.Where(r => r.Rating.HasValue).Select(r => (double?)r.Rating.Value).Average() ?? 0)
+            .ThenBy(p => p.Id);
+    }
     else
-        produseQuery = produseQuery.OrderBy(p => p.Id); // fallback stabil
+    {
+        produseQuery = produseQuery.OrderBy(p => p.Id);
+    }
 
     // Paginare
     int totalItems = await produseQuery.CountAsync();

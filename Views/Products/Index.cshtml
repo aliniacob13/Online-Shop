@@ -74,8 +74,10 @@
                     <div class="fw-semibold mb-2">Sortare</div>
                     <select class="form-select" name="sortarePret">
                         <option value="" selected="@selRel">Relevanta</option>
-                        <option value="crescator" selected="@selCresc">Pret crescator</option>
-                        <option value="descrescator" selected="@selDesc">Pret descrescator</option>
+                        <option value="pret_crescator" selected="@(sortarePret == "pret_crescator" ? "selected" : null)">Pret crescator</option>
+                        <option value="pret_descrescator" selected="@(sortarePret == "pret_descrescator" ? "selected" : null)">Pret descrescator</option>
+                        <option value="rating_crescator" selected="@(sortarePret == "rating_crescator" ? "selected" : null)">Rating crescator</option>
+                        <option value="rating_descrescator" selected="@(sortarePret == "rating_descrescator" ? "selected" : null)">Rating descrescator</option>
                     </select>
 
                     <button type="submit" class="btn btn-primary w-100 mt-3 pill">Aplica</button>
