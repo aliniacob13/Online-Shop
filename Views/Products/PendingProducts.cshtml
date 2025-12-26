@@ -1,0 +1,58 @@
+﻿@model IEnumerable<OnlineShop.Models.Product>
+
+<h2>Produse în așteptare pentru aprobare</h2>
+
+@if (!Model.Any())
+{
+    <p>Nu există produse în așteptare.</p>
+}
+else
+{
+    foreach (var item in Model)
+    {
+        <div class="card mb-3 p-3">
+            <h4>@item.Title</h4>
+
+            <p><strong>Utilizator:</strong> @item.User.UserName</p>
+            <p><strong>Categorie:</strong> @item.Category?.Name</p>
+            <p><strong>Descriere:</strong> @item.Description</p>
+            <p><strong>Stoc:</strong> @item.Stock</p>
+
+            @if (!string.IsNullOrEmpty(item.ImageUrl))
+            {
+                <img src="@item.ImageUrl" alt="@item.Title" class="img-thumbnail mb-2" style="max-width:150px;">
+            }
+
+            <p>
+                Status:
+                <span class="badge bg-warning text-dark">In asteptare</span>
+            </p>
+
+
+            <form asp-action="Reject" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@item.Id" />
+
+                <div class="d-flex gap-2 mb-3">
+                    <!-- APPROVE -->
+                    <button formaction="/Products/Approve"
+                            class="btn btn-success btn-sm">
+                        Approve
+                    </button>
+
+                    <!-- REJECT -->
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Reject
+                    </button>
+                </div>
+
+                <!-- textul sa se intinda pe toata casuta de feedback -->
+                <textarea name="feedback"
+                  class="form-control w-100 mb-2"
+                  style="min-height: 90px;"
+                  placeholder="Scrie feedback pentru colaborator (optional)..."></textarea>
+            </form>
+        </div>
+           
+    }
+}

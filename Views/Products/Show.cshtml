@@ -1,0 +1,309 @@
+@model OnlineShop.Models.Product
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using System.Security.Claims
+@using System.Linq
+
+@{
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var canManageProduct = User.IsInRole("Admin") || Model.UserId == currentUserId;
+    double? medie = ViewBag.AverageRating as double?;
+    bool canReview = ViewBag.CanReview is bool b && b;
+    var isAdmin = User.IsInRole("Admin");
+    var isEditorOrUser = User.IsInRole("Editor") || User.IsInRole("User");
+}
+
+<br />
+
+<div class="card">
+    <partial name="ProdusInfo" model="Model"></partial>
+
+    @*zona de cos si wishlist *@
+    <div class="mt-3 d-flex gap-2 px-3 pb-3">
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            @*exista input numeric pentru cantitate *@
+            <form asp-controller="Cart"
+                  asp-action="Add"
+                  method="post"
+                  class="d-inline d-flex align-items-center gap-2">
+                <input type="hidden" name="productId" value="@Model.Id" />
+
+                <input type="number"
+                       name="quantity"
+                       value="1"
+                       min="1"
+                       class="form-control"
+                       style="width: 90px;" />
+
+                <button type="submit" class="btn btn-success">
+                    Adaugă în coș
+                </button>
+            </form>
+
+            <form asp-controller="Wishlist"
+                  asp-action="Add"
+                  method="post"
+                  class="d-inline">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-secondary">
+                    Adaugă la wishlist
+                </button>
+            </form>
+        }
+        else
+        {
+            <button type="button"
+                    class="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#loginCartModal">
+                Adaugă în coș
+            </button>
+
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#loginWishlistModal">
+                Adaugă la wishlist
+            </button>
+        }
+    </div>
+
+    @if (canManageProduct)
+    {
+        <div class="d-flex flex-row justify-content-between px-3 pb-3">
+
+            <a class="btn btn-success"
+               asp-controller="Products"
+               asp-action="Edit"
+               asp-route-id="@Model.Id">
+                Editează produs
+            </a>
+
+            <form asp-controller="Products"
+                  asp-action="Delete"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  onsubmit="return confirm('Ești sigur că vrei să ștergi acest produs?');">
+                <button type="submit" class="btn btn-danger">Șterge produs</button>
+            </form>
+
+        </div>
+    }
+</div>
+
+@*scorul mediu al produsului*@
+@{
+    var ratingValues = Model.Reviews
+        .Where(r => r.Rating.HasValue)
+        .Select(r => r.Rating!.Value)
+        .ToList();
+
+    double? averageRating = ratingValues.Any() ? ratingValues.Average() : null;
+}
+
+@if (averageRating.HasValue)
+{
+    <div class="alert alert-info mt-3">
+        Scor mediu al produsului:
+        <strong>@averageRating.Value.ToString("0.0")</strong> / 5
+        <span class="text-muted">
+            (bazat pe @ratingValues.Count review-uri)
+        </span>
+    </div>
+}
+
+@*modal login pt cos/wishlist *@
+@if (User.Identity == null || !User.Identity.IsAuthenticated)
+{
+    <div class="modal fade" id="loginCartModal" tabindex="-1" aria-labelledby="loginCartModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginCartModalLabel">Autentificare necesară</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button>
+                </div>
+                <div class="modal-body">
+                    Pentru a continua, autentifică-te sau creează un cont.
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary"
+                       asp-area="Identity"
+                       asp-page="/Account/Login"
+                       asp-route-returnUrl="@Url.Action("AddAfterLogin", "Cart", new { productId = Model.Id, quantity = 1 })">
+                        Login
+                    </a>
+                    <a class="btn btn-secondary"
+                       asp-area="Identity"
+                       asp-page="/Account/Register"
+                       asp-route-returnUrl="@Url.Action("AddAfterLogin", "Cart", new { productId = Model.Id, quantity = 1 })">
+                        Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="loginWishlistModal" tabindex="-1" aria-labelledby="loginWishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginWishlistModalLabel">Autentificare necesară</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button>
+                </div>
+                <div class="modal-body">
+                    Pentru a continua, autentifică-te sau creează un cont.
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary"
+                       asp-area="Identity"
+                       asp-page="/Account/Login"
+                       asp-route-returnUrl="@Url.Action("AddAfterLogin", "Wishlist", new { productId = Model.Id })">
+                        Login
+                    </a>
+                    <a class="btn btn-secondary"
+                       asp-area="Identity"
+                       asp-page="/Account/Register"
+                       asp-route-returnUrl="@Url.Action("AddAfterLogin", "Wishlist", new { productId = Model.Id })">
+                        Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<br />
+<br />
+
+@*afisare reviewuri *@
+<div id="reviews-container" class="mb-3">
+    @foreach (var review in Model.Reviews)
+    {
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-body">
+
+                            @if (review.Rating.HasValue)
+                            {
+                                <p class="mb-1">
+                                    <strong>Rating:</strong> @review.Rating
+                                </p>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(review.Comment))
+                            {
+                                <p class="mb-1">
+                                    <strong>Comentariu:</strong> @review.Comment
+                                </p>
+                            }
+
+                            <p class="text-muted mb-3"><small>@review.DatePosted</small></p>
+
+                            @{
+                                var isOwner = review.UserId == currentUserId;
+                            }
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <div class="d-flex gap-2">
+                                    @if (isAdmin || (isEditorOrUser && isOwner))
+                                    {
+                                        <a class="btn btn-outline-primary btn-sm"
+                                           asp-controller="Reviews"
+                                           asp-action="Edit"
+                                           asp-route-id="@review.Id">
+                                            <i class="bi bi-pencil-square"></i> Editează
+                                        </a>
+                                    }
+
+                                    @if (isAdmin || (isEditorOrUser && isOwner))
+                                    {
+                                        <form method="post"
+                                              asp-controller="Reviews"
+                                              asp-action="Delete"
+                                              asp-route-id="@review.Id"
+                                              onsubmit="return confirm('Sigur vrei să ștergi acest review?');">
+                                            <button class="btn btn-outline-danger btn-sm" type="submit">
+                                                <i class="bi bi-trash"></i> Șterge
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@*formular pt adaugare review *@
+@if (User.Identity != null && User.Identity.IsAuthenticated && canReview)
+{
+    <div class="container mt-4" id="zona-review">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        Adaugă un review
+                    </div>
+                    <div class="card-body">
+                        <form method="post"
+                              id="review-form"
+                              asp-controller="Reviews"
+                              asp-action="Create">
+
+                            <input type="hidden" name="ProductId" value="@Model.Id" />
+
+                            <div asp-validation-summary="All" class="text-danger mb-3 validation-summary"></div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Rating (1 - 5)</label>
+                                <select name="Rating" class="form-select">
+                                    <option value="">Fără rating</option>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Comentariu</label>
+                                <textarea name="Comment"
+                                          class="form-control"
+                                          rows="3"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">
+                                Adaugă review
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (User.Identity != null && User.Identity.IsAuthenticated && !canReview)
+{
+    <div class="container mt-4">
+        <div class="alert alert-secondary">
+            Poți lăsa un review doar pentru produsele pe care le-ai achiziționat.
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="alert alert-secondary">
+            Pentru a lăsa un review trebuie să te autentifici și să fi cumpărat acest produs.
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

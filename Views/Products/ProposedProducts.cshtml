@@ -1,0 +1,61 @@
+﻿@model IEnumerable<OnlineShop.Models.Product>
+
+<h2 class="mb-4">Produsele mele propuse</h2>
+
+@if (!Model.Any())
+{
+    <p>Nu ai propus încă niciun produs.</p>
+}
+else
+{
+    foreach (var p in Model)
+    {
+        <div class="card mb-3 p-3">
+
+            <h4>@p.Title</h4>
+            <p>Categorie: @p.Category?.Name</p>
+
+            <p>
+                Status:
+                @if (p.Status == ProductStatus.Approved)
+                {
+                    <span class="badge bg-success">Aprobat</span>
+                }
+                else if (p.Status == ProductStatus.Pending)
+                {
+                    <span class="badge bg-warning text-dark">În așteptare</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Respins</span>
+                }
+            </p>
+
+            @*feedback admin daca exista*@
+            @if (!string.IsNullOrEmpty(p.AdminFeedback))
+            {
+                <p class="text-muted"><strong>Feedback admin:</strong> @p.AdminFeedback</p>
+            }
+
+            @*buton de editare doar daca produsul nu este Approved *@
+            @if (p.Status != ProductStatus.Approved)
+            {
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center">
+                        Editează
+                    </a>
+
+                    <form asp-controller="Products"
+                          asp-action="Delete"
+                          asp-route-id="@p.Id"
+                          method="post"
+                          onsubmit="return confirm('Esti sigur ca vrei sa stergi acest produs?');">
+                        <button type="submit" class="btn btn-danger">Sterge produs</button>
+                    </form>
+                </div>
+
+
+            }
+        </div>
+    }
+}

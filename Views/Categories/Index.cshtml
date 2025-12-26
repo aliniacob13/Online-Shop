@@ -1,0 +1,81 @@
+@model IEnumerable<OnlineShop.Models.Category>
+
+<h1>Lista Categorii</h1>
+
+@if (TempData["message"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["message"]
+    </div>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+{
+    <p>
+        <a asp-action="New" class="btn btn-primary">Adauga categorie noua</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Nume Categorie</th>
+            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+            { 
+                <th>Actiuni</th>
+            }
+            else
+            {
+                <th>Vezi produsele!</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model == null || !Model.Any())
+    {
+        <tr>
+            <td colspan="2" class="text-center">Nu sunt categorii.</td>
+        </tr>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-warning">
+                            Editeaza
+                        </a>
+
+                        <form asp-action="Delete"
+                              asp-route-id="@item.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Sigur vrei să ștergi categoria?');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Sterge
+                            </button>
+                            </form>
+                        }
+                        else //utilizatorul poate filtra produsele in functie de categorie
+                        {
+                            <a asp-controller="Products"
+                               asp-action="Index"
+                               asp-route-categoryId="@item.Id"
+                               class="btn btn-sm btn-info">
+                                Produse
+                            </a>
+                        }
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>

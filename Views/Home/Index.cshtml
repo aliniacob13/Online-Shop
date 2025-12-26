@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Acasă";
+}
+
+<div class="home-hero">
+    <div class="home-hero-inner">
+        <div class="hero-left">
+            <span class="hero-eyebrow">Toate produsele Apple de care ai nevoie, într-un singur loc</span>
+            <h1 class="hero-title">
+                Mac, iPhone și accesorii<br />
+                într-un singur loc.
+            </h1>
+
+            <p class="hero-subtitle">
+                Produse Apple alese pentru productivitate, creativitate și proiectele tale de facultate. 
+                Curat, simplu și ușor de folosit.
+            </p>
+
+            <div class="hero-actions">
+                <a class="btn btn-dark hero-primary"
+                   asp-controller="Products"
+                   asp-action="Index">
+                    Vezi produsele
+                </a>
+
+                <a class="btn btn-outline-secondary hero-secondary"
+                   asp-controller="Categories"
+                   asp-action="Index">
+                    Explorează categoriile
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="hero-quote-card">
+                <p class="hero-quote">
+                    “Design is not just what it looks like and feels like. Design is how it works.”
+                </p>
+                <p class="hero-quote-author">Steve Jobs</p>
+            </div>
+
+            <div class="hero-device-card">
+                <div class="hero-device-circle"></div>
+                <div class="hero-device-content">
+                    <span class="device-tag">MacBook Air</span>
+                    <p class="device-title">Subțire. Puternic. Gata de cod.</p>
+                    <p class="device-subtitle">
+                        Autonomie mare, silențios și perfect pentru Visual Studio, Rider și toate proiectele tale.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="hero-divider" />
+
+<div class="home-features">
+    <div class="feature-item">
+        <i class="bi bi-lightning-charge"></i>
+        <h3>Livrare rapidă</h3>
+        <p>Produse pregătite să ajungă la tine cât mai repede.</p>
+    </div>
+    <div class="feature-item">
+        <i class="bi bi-check2-circle"></i>
+        <h3>Selecție atentă</h3>
+        <p>Doar device-uri și accesorii compatibile între ele.</p>
+    </div>
+    <div class="feature-item">
+        <i class="bi bi-shield-check"></i>
+        <h3>Siguranță</h3>
+        <p>Cont, comenzi și plăți protejate la fiecare pas.</p>
+    </div>
+</div>

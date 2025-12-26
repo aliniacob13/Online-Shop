@@ -1,0 +1,412 @@
+@model IEnumerable<OnlineShop.Models.Product>
+
+@{
+    var isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
+}
+
+<style>
+    /* minimalist, mobile first */
+    .page-wrap { max-width: 980px; }
+    .page-title { letter-spacing: -0.02em; }
+    .surface {
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 18px;
+        background: #fff;
+    }
+    .product-card {
+        border: 1px solid rgba(0,0,0,.08);
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .pill { border-radius: 999px; }
+    .muted { color: rgba(0,0,0,.55); }
+    .rating-star { font-size: 14px; line-height: 1; }
+    .qty { width: 86px; }
+</style>
+
+<div class="container py-3 page-wrap">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2 class="page-title mb-0">Produse</h2>
+            <div class="small muted">@ViewBag.CategoryName</div>
+        </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+        {
+            <a asp-action="Create" class="btn btn-primary pill">
+                Adauga produs
+            </a>
+        }
+    </div>
+
+    <!-- cautare produse dupa nume -->
+    <div class="surface p-3 mb-3">
+        <form asp-action="Index" method="get">
+            <div class="input-group">
+                <input type="text"
+                       name="searchString"
+                       value="@ViewBag.SearchString"
+                       class="form-control pill"
+                       placeholder="Cauta produs..." />
+                <button type="submit" class="btn btn-outline-secondary pill">
+                    Cauta
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center muted py-5">
+            Nu exista produse inca.
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var produs in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="product-card p-3 h-100">
+
+                        <partial name="ProdusInfo"
+                                 model="produs"
+                                 view-data='new ViewDataDictionary(ViewData) { { "AfiseazaDescriere", false } }' />
+
+                        @* Rating vizibil direct in listare *@
+                        @{
+                            double avg = 0.0;
+                            int nr = 0;
+
+                            if (produs.Reviews != null && produs.Reviews.Any(r => r.Rating.HasValue))
+                            {
+                                nr = produs.Reviews.Count(r => r.Rating.HasValue);
+                                avg = produs.Reviews.Where(r => r.Rating.HasValue).Average(r => r.Rating!.Value);
+                            }
+                        }
+
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            <div class="small muted d-flex align-items-center gap-1">
+                                <span class="rating-star">★</span>
+                                <span>@avg.ToString("0.0")/5</span>
+                                <span class="muted">(@nr)</span>
+                            </div>
+
+                            @* Status si feedback pentru admin/editor *@
+                            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+                            {
+                                <div class="text-end">
+                                    @if (produs.Status == ProductStatus.Approved)
+                                    {
+                                        <span class="badge bg-success">Aprobat</span>
+                                    }
+                                    else if (produs.Status == ProductStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark">In asteptare</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Respins</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if ((User.IsInRole("Admin") || User.IsInRole("Editor")) && !string.IsNullOrEmpty(produs.AdminFeedback))
+                        {
+                            <div class="small muted mt-1">
+                                Feedback admin: <strong>@produs.AdminFeedback</strong>
+                            </div>
+                        }
+
+                        <div class="mt-3 d-flex flex-wrap gap-2">
+                            <a class="btn btn-success btn-sm pill"
+                               asp-controller="Products"
+                               asp-action="Show"
+                               asp-route-id="@produs.Id">
+                                Afisare produs
+                            </a>
+
+                            @if (isAuthenticated)
+                            {
+                                <!-- Formular pentru adaugare in cos (user logat) -->
+                                <form asp-controller="Cart"
+                                      asp-action="Add"
+                                      method="post"
+                                      class="add-to-cart-form d-flex align-items-center gap-2"
+                                      data-stock="@produs.Stock"
+                                      data-product-id="@produs.Id">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@produs.Id" />
+                                    <input type="number"
+                                           name="quantity"
+                                           value="1"
+                                           min="1"
+                                           class="form-control form-control-sm qty quantity-input pill"
+                                           aria-label="Cantitate" />
+                                    <button type="submit" class="btn btn-primary btn-sm pill">
+                                        Adauga in cos
+                                    </button>
+                                </form>
+
+                                <!-- Formular pentru adaugare in wishlist (user logat) -->
+                                <form asp-controller="Wishlist"
+                                      asp-action="Add"
+                                      method="post"
+                                      class="add-to-wishlist-form d-inline"
+                                      data-product-id="@produs.Id">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@produs.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm pill" title="Adauga in wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                @* Vizitator: butoane care deschid popup Login/Register *@
+                                <button type="button"
+                                        class="btn btn-primary btn-sm pill btn-anon-add-cart"
+                                        data-product-id="@produs.Id">
+                                    Adauga in cos
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm pill btn-anon-add-wishlist"
+                                        data-product-id="@produs.Id">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+
+        
+        
+        int currentPage = ViewBag.CurrentPage == null ? 1 : Convert.ToInt32(ViewBag.CurrentPage);
+        int lastPage = ViewBag.lastPage == null ? 1 : Convert.ToInt32(ViewBag.lastPage);
+        string baseUrl = ViewBag.PaginationBaseUrl as string ?? "/Products/Index?page=";
+        
+        
+
+        @if (lastPage > 1)
+        {
+            <nav class="mt-4" aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@(currentPage <= 1 ? "#" : baseUrl + (currentPage - 1))"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= lastPage; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="@(baseUrl + i)">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(currentPage >= lastPage ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@(currentPage >= lastPage ? "#" : baseUrl + (currentPage + 1))"
+                           aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        }
+    }
+</div>
+
+@* Modal pentru stoc insuficient (folosit doar la user logat) *@
+<div class="modal fade"
+     id="stockModalIndex"
+     tabindex="-1"
+     aria-labelledby="stockModalIndexLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stockModalIndexLabel">Stoc insuficient</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Inchide"></button>
+            </div>
+            <div class="modal-body">
+                Nu exista stoc suficient pentru cantitatea solicitata.
+                <br />
+                Poti renunta sau poti adauga produsul in wishlist.
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Renunta
+                </button>
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btnAddToWishlistFromModalIndex">
+                    Adauga in wishlist
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal pentru vizitatori (login/register cu returnUrl spre AddAfterLogin) *@
+@if (!isAuthenticated)
+{
+    <div class="modal fade"
+         id="loginModalIndex"
+         tabindex="-1"
+         aria-labelledby="loginModalIndexLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalIndexLabel">Autentificare necesara</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Inchide"></button>
+                </div>
+                <div class="modal-body">
+                    Pentru a continua, autentifica-te sau creeaza un cont.
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" id="loginModalIndexLink">
+                        Login
+                    </a>
+                    <a class="btn btn-secondary" id="registerModalIndexLink">
+                        Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var userAuthenticated = @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+
+            var modalEl = document.getElementById("stockModalIndex");
+            if (!modalEl) { return; }
+            var stockModal = new bootstrap.Modal(modalEl);
+
+            var currentWishlistForm = null;
+
+            var cartForms = document.querySelectorAll("form.add-to-cart-form");
+            cartForms.forEach(function (form) {
+                form.addEventListener("submit", function (e) {
+                    var stock = parseInt(form.dataset.stock || "0");
+
+                    var qtyInput = form.querySelector("input.quantity-input");
+                    var qty = 1;
+                    if (qtyInput && qtyInput.value) {
+                        var parsed = parseInt(qtyInput.value);
+                        if (!isNaN(parsed) && parsed > 0) {
+                            qty = parsed;
+                        }
+                    }
+
+                    if (qty > stock) {
+                        e.preventDefault();
+
+                        var productId = form.dataset.productId;
+                        currentWishlistForm = document.querySelector(
+                            "form.add-to-wishlist-form[data-product-id='" + productId + "']"
+                        );
+
+                        stockModal.show();
+                    }
+                });
+            });
+
+            var btnWishlist = document.getElementById("btnAddToWishlistFromModalIndex");
+            if (btnWishlist) {
+                btnWishlist.addEventListener("click", function () {
+                    if (currentWishlistForm) {
+                        currentWishlistForm.submit();
+                    }
+                });
+            }
+        })();
+    </script>
+
+    @if (!isAuthenticated)
+    {
+        <script>
+            (function () {
+                var modalEl = document.getElementById("loginModalIndex");
+                if (!modalEl) return;
+
+                var modal = new bootstrap.Modal(modalEl);
+
+                var loginLink = document.getElementById("loginModalIndexLink");
+                var registerLink = document.getElementById("registerModalIndexLink");
+                if (!loginLink || !registerLink) return;
+
+                var baseLoginUrl = '@Url.Page("/Account/Login", new { area = "Identity" })';
+                var baseRegisterUrl = '@Url.Page("/Account/Register", new { area = "Identity" })';
+
+                var baseAddCartAfterLogin = '@Url.Action("AddAfterLogin", "Cart")';
+                var baseAddWishlistAfterLogin = '@Url.Action("AddAfterLogin", "Wishlist")';
+
+                var currentMode = null;
+                var currentProductId = null;
+
+                function setLinks() {
+                    if (!currentProductId || !currentMode) return;
+
+                    var returnUrlBase;
+                    if (currentMode === "cart") {
+                        returnUrlBase = baseAddCartAfterLogin + '?productId=' + currentProductId + '&quantity=1';
+                    } else {
+                        returnUrlBase = baseAddWishlistAfterLogin + '?productId=' + currentProductId;
+                    }
+
+                    var encoded = encodeURIComponent(returnUrlBase);
+
+                    loginLink.href = baseLoginUrl + '?returnUrl=' + encoded;
+                    registerLink.href = baseRegisterUrl + '?returnUrl=' + encoded;
+                }
+
+                document.querySelectorAll(".btn-anon-add-cart").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        currentMode = "cart";
+                        currentProductId = btn.dataset.productId;
+                        setLinks();
+                        modal.show();
+                    });
+                });
+
+                document.querySelectorAll(".btn-anon-add-wishlist").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        currentMode = "wishlist";
+                        currentProductId = btn.dataset.productId;
+                        setLinks();
+                        modal.show();
+                    });
+                });
+            })();
+        </script>
+    }
+}

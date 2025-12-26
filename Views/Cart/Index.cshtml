@@ -1,0 +1,67 @@
+﻿@model IEnumerable<OnlineShop.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Cosul meu";
+    decimal total = 0;
+}
+
+<h2>Cosul meu</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Cosul este gol.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Produs</th>
+                <th>Pret unitar</th>
+                <th>Cantitate</th>
+                <th>Subtotal</th>
+                <th>Actiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var subtotal = item.Quantity * item.Product.Price;
+                total += subtotal;
+                <tr>
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="@item.Product.Title" width="80" class="img-thumbnail" />
+                        <br />
+                        @item.Product.Title
+                    </td>
+                    <td>@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <form asp-action="UpdateQuantity" method="post" class="d-flex">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control me-2" style="width:80px;" />
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td>@subtotal.ToString("C")</td>
+                    <td>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Sterge</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td colspan="2"><strong>@total.ToString("C")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <form asp-action="Checkout" method="post">
+        <button type="submit" class="btn btn-success">Plaseaza comanda</button>
+    </form>
+}
+

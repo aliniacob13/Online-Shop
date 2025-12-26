@@ -1,0 +1,60 @@
+@model OnlineShop.Models.Product
+@{
+    bool afiseazaDescriere = true;
+    if (ViewData["AfiseazaDescriere"] is bool b)
+    {
+        afiseazaDescriere = b;
+    }
+}
+<div class="card-body">
+    <div class="row g-4">
+        <!-- Imagine produs -->
+        <div class="col-md-5 text-center">
+            @if (!string.IsNullOrWhiteSpace(Model?.ImageUrl))
+            {
+                <img src="@Model.ImageUrl"
+                     alt="@Model.Title"
+                     class="img-fluid rounded shadow-sm" />
+            }
+        </div>
+
+        <!-- Detalii produs -->
+        <div class="col-md-7 d-flex flex-column gap-2">
+            <h3 class="card-title fw-bold mb-2">
+                @Model?.Title
+            </h3>
+
+            @if (afiseazaDescriere && !string.IsNullOrWhiteSpace(Model?.Description))
+            {
+                <p class="text-muted mb-2">
+                    @Model.Description
+                </p>
+            }
+
+            <div class="d-flex align-items-center gap-3 mb-2">
+                @if (Model != null)
+                {
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        Preț: @Model.Price.ToString("0.00") lei
+                    </span>
+
+                    <span class="badge bg-secondary px-3 py-2">
+                        Stoc: @Model.Stock
+                    </span>
+                }
+            </div>
+
+            <div class="mt-2 text-muted">
+                <i class="bi bi-tag"></i>
+                @if (Model?.Category != null)
+                {
+                    @Model.Category.Name
+                }
+                else
+                {
+                    <span class="fst-italic">Fără categorie</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>

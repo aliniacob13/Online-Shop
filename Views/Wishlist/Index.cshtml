@@ -1,0 +1,56 @@
+﻿@model IEnumerable<OnlineShop.Models.WishlistItem>
+
+@{
+    ViewData["Title"] = "Wishlist";
+}
+
+<h2>Wishlist-ul meu</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Wishlist-ul meu este gol.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Produs</th>
+                <th>Pret</th>
+                <th>Actiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="@item.Product.Title" width="80" class="img-thumbnail" />
+                        <br />
+                        @item.Product.Title
+                    </td>
+                    <td>@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <form asp-action="Remove" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Sterge</button>
+                        </form>
+
+                        <!-- Formularul pentru a muta produsul din wishlist in cos -->
+                        <form asp-action="MoveToCart" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id" /> <!-- ID-ul produsului din wishlist -->
+                            <button type="submit" class="btn btn-success btn-sm">Adauga in cos</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (TempData["message"] != null)
+{
+    var type = TempData["messagetype"] ?? "alert-info";
+    <div class="alert @type mt-3">@TempData["message"]</div>
+}

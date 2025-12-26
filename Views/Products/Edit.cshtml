@@ -1,0 +1,73 @@
+@model OnlineShop.ViewModels.ProductEditViewModel
+
+<h2 class="text-center mb-4">Editare produs</h2>
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="form-label">Denumire Produs</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="form-label">Descriere Produs</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Price" class="form-label">Pret Produs</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Stock" class="form-label">Stoc</label>
+                <input asp-for="Stock" class="form-control" />
+                <span asp-validation-for="Stock" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CategoryId" class="form-label">Selectati categoria</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
+                    <option value="">-- Selectati categoria --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Imagine curenta</label><br />
+                @if (!string.IsNullOrEmpty(Model.ImageUrlCurenta))
+                {
+                    <img src="@Model.ImageUrlCurenta" alt="Imagine produs"
+                         style="max-width: 200px; max-height: 200px" />
+                }
+                else
+                {
+                    <p>(Nu exista imagine salvata)</p>
+                }
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="ImagineNoua" class="form-label">Incarca imagine noua (optional)</label>
+                <input asp-for="ImagineNoua" type="file" class="form-control" />
+                <span asp-validation-for="ImagineNoua" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                Modifica produs
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

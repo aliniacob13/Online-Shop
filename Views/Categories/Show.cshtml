@@ -1,0 +1,10 @@
+@model OnlineShop.Models.Category
+@{
+    ViewBag.Title = "Afisare Categorie";
+}
+<h2>@ViewBag.Title</h2>
+<br/>
+<p>@Model.Name</p>
+<form method="post" asp-action="Delete" asp-controller="Categories" asp-route-id="@Model.Id">
+    <button type="submit" class="btn btn-danger">Sterge Categorie</button>
+</form>
