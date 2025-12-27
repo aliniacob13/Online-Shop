@@ -26,6 +26,7 @@
                   asp-action="Add"
                   method="post"
                   class="d-inline d-flex align-items-center gap-2">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="productId" value="@Model.Id" />
 
                 <input type="number"
@@ -44,6 +45,7 @@
                   asp-action="Add"
                   method="post"
                   class="d-inline">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="productId" value="@Model.Id" />
                 <button type="submit" class="btn btn-outline-secondary">
                     Adaugă la wishlist
@@ -84,6 +86,7 @@
                   asp-route-id="@Model.Id"
                   method="post"
                   onsubmit="return confirm('Ești sigur că vrei să ștergi acest produs?');">
+                @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-danger">Șterge produs</button>
             </form>
 
@@ -224,6 +227,7 @@
                                               asp-action="Delete"
                                               asp-route-id="@review.Id"
                                               onsubmit="return confirm('Sigur vrei să ștergi acest review?');">
+                                            @Html.AntiForgeryToken()
                                             <button class="btn btn-outline-danger btn-sm" type="submit">
                                                 <i class="bi bi-trash"></i> Șterge
                                             </button>
@@ -254,6 +258,7 @@
                               id="review-form"
                               asp-controller="Reviews"
                               asp-action="Create">
+                            @Html.AntiForgeryToken()
 
                             <input type="hidden" name="ProductId" value="@Model.Id" />
 
@@ -304,6 +309,142 @@ else
     </div>
 }
 
+@* ======= Product Assistant (Gemini) - chat lateral ======= *@
+<style>
+    .assistant-panel {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        width: 340px;
+        max-width: calc(100vw - 36px);
+        height: 420px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.10);
+        border-radius: 16px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.12);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1050;
+    }
+    .assistant-header {
+        padding: 10px 12px;
+        background: rgba(0,0,0,.03);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    .assistant-messages {
+        padding: 10px 12px;
+        flex: 1;
+        overflow: auto;
+        font-size: 14px;
+    }
+    .assistant-bubble {
+        padding: 8px 10px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        max-width: 90%;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    .assistant-user { background: rgba(13,110,253,.10); margin-left: auto; }
+    .assistant-ai { background: rgba(25,135,84,.10); }
+    .assistant-footer {
+        padding: 10px 12px;
+        border-top: 1px solid rgba(0,0,0,.08);
+        display: flex;
+        gap: 8px;
+    }
+</style>
+
+<div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-header">
+        <span>Product Assistant</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="assistantToggle">Ascunde</button>
+    </div>
+
+    <div class="assistant-messages" id="assistantMessages">
+        <div class="assistant-bubble assistant-ai">
+            Pune o intrebare despre produs. Raspund din descriere si FAQ.
+        </div>
+    </div>
+
+    <form class="assistant-footer" id="assistantForm" method="post">
+        @Html.AntiForgeryToken()
+        <input type="text" class="form-control" id="assistantInput" placeholder="Ex: Are garantie?" />
+        <button type="submit" class="btn btn-primary">Trimite</button>
+    </form>
+</div>
+
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        (function () {
+            var panel = document.getElementById("assistantPanel");
+            var btnToggle = document.getElementById("assistantToggle");
+            var form = document.getElementById("assistantForm");
+            var input = document.getElementById("assistantInput");
+            var msgs = document.getElementById("assistantMessages");
+
+            var ascuns = false;
+
+            function adaugaMesaj(text, tip) {
+                var div = document.createElement("div");
+                div.className = "assistant-bubble " + (tip === "user" ? "assistant-user" : "assistant-ai");
+                div.textContent = text;
+                msgs.appendChild(div);
+                msgs.scrollTop = msgs.scrollHeight;
+            }
+
+            btnToggle.addEventListener("click", function () {
+                ascuns = !ascuns;
+                if (ascuns) {
+                    msgs.style.display = "none";
+                    form.style.display = "none";
+                    btnToggle.textContent = "Afiseaza";
+                    panel.style.height = "52px";
+                } else {
+                    msgs.style.display = "";
+                    form.style.display = "";
+                    btnToggle.textContent = "Ascunde";
+                    panel.style.height = "420px";
+                }
+            });
+
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault();
+                var text = (input.value || "").trim();
+                if (!text) return;
+
+                adaugaMesaj(text, "user");
+                input.value = "";
+
+                var tokenEl = form.querySelector('input[name="__RequestVerificationToken"]');
+                var token = tokenEl ? tokenEl.value : "";
+
+                try {
+                    var resp = await fetch('@Url.Action("AskAssistant", "Products")', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        },
+                        body: new URLSearchParams({
+                            "__RequestVerificationToken": token,
+                            "productId": "@Model.Id",
+                            "message": text
+                        })
+                    });
+
+                    var data = await resp.json();
+                    adaugaMesaj((data && data.answer) ? data.answer : "Momentan nu avem detalii despre acest aspect.", "ai");
+                } catch (err) {
+                    adaugaMesaj("Momentan nu avem detalii despre acest aspect.", "ai");
+                }
+            });
+        })();
+    </script>
 }

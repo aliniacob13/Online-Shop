@@ -47,7 +47,7 @@ public class Product
     
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
-
+    public ICollection<ProductFaq> Faqs { get; set; } = new List<ProductFaq>();
 
     //RELATII
 

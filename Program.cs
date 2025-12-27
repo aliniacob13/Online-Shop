@@ -3,6 +3,10 @@ using OnlineShop.Data;
 using OnlineShop.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.AspNetCore.Identity;
+using OnlineShop.Services;
+
+DotNetEnv.Env.Load();
+//var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +41,10 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 //MVC + Razor Pages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// Product Assistant (Gemini)
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IProductAssistantService, GeminiProductAssistantService>();
 
 var app = builder.Build();
 

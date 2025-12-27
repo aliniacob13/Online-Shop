@@ -1,0 +1,65 @@
+@model IEnumerable<OnlineShop.Models.ProductFaq>
+
+    @{
+    ViewData["Title"] = "Admin FAQ";
+    int? pid = ViewBag.ProductId as int?;
+}
+
+<h2>FAQ produse</h2>
+
+@if (TempData["message"] != null)
+{
+    <div class="alert alert-info">@TempData["message"]</div>
+}
+
+<a class="btn btn-outline-secondary mb-3"
+   asp-controller="AdminTopQuestions"
+   asp-action="Index">
+    Inapoi la Top intrebari
+</a>
+
+@if (pid.HasValue)
+{
+    <a class="btn btn-primary mb-3" asp-action="Create" asp-route-productId="@pid.Value">Adauga FAQ</a>
+}
+else
+{
+    <div class="alert alert-warning">Trimite productId in URL ca sa administrezi FAQ pe un produs.</div>
+}
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+    <th>Produs</th>
+    <th>Intrebare</th>
+    <th>Aprobat</th>
+    <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var f in Model)
+    {
+        <tr>
+            <td>@f.Product?.Title (@f.ProductId)</td>
+            <td>@f.Question</td>
+            <td>@(f.IsApproved ? "DA" : "NU")</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@f.Id">Editeaza</a>
+
+                <form asp-action="ToggleApprove" asp-route-id="@f.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-sm btn-secondary" type="submit">
+                        @(f.IsApproved ? "Dezaproba" : "Aproba")
+                    </button>
+                </form>
+
+                <form asp-action="Delete" asp-route-id="@f.Id" method="post" class="d-inline"
+                      onsubmit="return confirm('Sigur stergi FAQ-ul?');">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+    </table>

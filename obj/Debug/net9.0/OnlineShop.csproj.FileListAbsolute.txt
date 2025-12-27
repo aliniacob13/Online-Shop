@@ -816,3 +816,5 @@
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/OnlineShop.csproj.Up2Date
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/OnlineShop.genruntimeconfig.cache
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/ref/OnlineShop.dll
+/Users/aliniacob/Documents/Projects/OnlineShop/bin/Debug/net9.0/DotNetEnv.dll
+/Users/aliniacob/Documents/Projects/OnlineShop/bin/Debug/net9.0/Sprache.dll

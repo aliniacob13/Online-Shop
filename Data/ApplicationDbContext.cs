@@ -22,7 +22,8 @@ namespace OnlineShop.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
-
+        public DbSet<ProductFaq> ProductFaqs { get; set; }
+        public DbSet<ProductQuestionLog> ProductQuestionLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -96,6 +97,24 @@ namespace OnlineShop.Data
                 .WithMany()
                 .HasForeignKey(w => w.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<ProductFaq>()
+                .HasOne(f => f.Product)
+                .WithMany(p => p.Faqs)
+                .HasForeignKey(f => f.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProductQuestionLog>()
+                .HasOne(l => l.Product)
+                .WithMany()
+                .HasForeignKey(l => l.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProductQuestionLog>()
+                .HasOne(l => l.MatchedFaq)
+                .WithMany()
+                .HasForeignKey(l => l.MatchedFaqId)
+                .OnDelete(DeleteBehavior.SetNull);
         
     }
     }

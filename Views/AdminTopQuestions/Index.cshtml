@@ -1,0 +1,53 @@
+@model IEnumerable<OnlineShop.Controllers.AdminTopQuestionsController.TopQVm>
+
+@{
+    ViewData["Title"] = "Top intrebari";
+    int days = (ViewBag.Days ?? 30);
+}
+
+<h2>Top intrebari (ultimele @days zile)</h2>
+
+<form method="get" class="mb-3">
+    <label class="me-2">Perioada (zile):</label>
+    <input type="number" name="days" value="@days" min="1" max="365" class="me-2" />
+    <button class="btn btn-sm btn-secondary" type="submit">Aplica</button>
+</form>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Produs</th>
+        <th>Intrebare</th>
+        <th>De cate ori</th>
+        <th>Ultima data</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var x in Model)
+    {
+        <tr>
+            <td>@x.ProductTitle (@x.ProductId)</td>
+            <td>@x.Question</td>
+            <td>@x.Count</td>
+            <td>@x.LastAsked.ToString("dd.MM.yyyy HH:mm")</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary me-2"
+                   asp-controller="AdminProductFaqs"
+                   asp-action="Index"
+                   asp-route-productId="@x.ProductId">
+                    Administreaza FAQ
+                </a>
+
+                <a class="btn btn-sm btn-primary"
+                   asp-controller="AdminProductFaqs"
+                   asp-action="Create"
+                   asp-route-productId="@x.ProductId"
+                   asp-route-question="@x.Question">
+                    Creeaza FAQ din asta
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

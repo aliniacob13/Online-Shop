@@ -6,19 +6,29 @@ using Microsoft.EntityFrameworkCore;
 using OnlineShop.Models;
 using OnlineShop.Data;
 using OnlineShop.ViewModels;
+using OnlineShop.Services;
+
 namespace OnlineShop.Controllers;
+
 public class ProductsController : Controller
 {
     private readonly ApplicationDbContext db;
     private readonly IWebHostEnvironment whe;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment webHostEnvironment)
+    private readonly IProductAssistantService produsAssistant;
+    public ProductsController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        IWebHostEnvironment webHostEnvironment,
+        IProductAssistantService produsAssistantService)
     {
         db = context;
-        _userManager=userManager;
-        _roleManager=roleManager;
+        _userManager = userManager;
+        _roleManager = roleManager;
         whe = webHostEnvironment;
+        produsAssistant = produsAssistantService;
     }
     
     [HttpGet]
@@ -232,7 +242,23 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
     return View(produsePagina);
 }
 
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AskAssistant(int productId, string message)
+    {
+        var userId = (User.Identity != null && User.Identity.IsAuthenticated)
+            ? _userManager.GetUserId(User)
+            : null;
 
+        var rezultat = await produsAssistant.AskAsync(productId, message, userId);
+
+        return Json(new
+        {
+            success = rezultat.Success,
+            answer = rezultat.Answer
+        });
+    }
 
     //Se "sterge" un produs din shop (soft delete)
     [HttpPost]
