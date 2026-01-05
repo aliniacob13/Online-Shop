@@ -10,8 +10,6 @@ Un online shop pentru produse Apple, cu UI minimalist inspirat de cultura celor 
 **Studenți:** Alin-Ovidiu Iacob, Eva-Cristiana Diaconescu  
 **Profesor coordonator:** Lect. Univ. Dr. Cezara Benegui
 
-**Stack:** ASP.NET Core MVC · Entity Framework Core · ASP.NET Identity · Bootstrap · C#
-
 ---
 
 ## Despre proiect
