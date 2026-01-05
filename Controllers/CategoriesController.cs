@@ -72,7 +72,6 @@ namespace OnlineShop.Controllers
 
             var currentUserId = _userManager.GetUserId(User);
 
-            // Admin sau Editor pot edita orice, User doar ce este al lui
             if (User.IsInRole("Admin") ||
                 User.IsInRole("Editor") ||
                 category.UserId == currentUserId)

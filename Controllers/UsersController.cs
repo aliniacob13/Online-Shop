@@ -27,10 +27,14 @@ namespace OnlineShop.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? email)
         {
-            var users=db.Users.OrderBy(u=>u.UserName);
+            var users = FiltreazaUseriDupaEmail(email)
+                .OrderBy(u => u.UserName)
+                .ToList();
+
             ViewBag.UsersList = users;
+            ViewBag.EmailSearch = email ?? "";
             return View();
         }
 
@@ -60,11 +64,11 @@ namespace OnlineShop.Controllers
             else
             {
                 ViewBag.AllRoles = GetAllRoles();
-                var roleNames=await _userManager.GetRolesAsync(user); //Lista de nume de roluri
+                var roleNames=await _userManager.GetRolesAsync(user); //obtinem numele rolurilor utilizatorului
                 ViewBag.UserRole = _roleManager.Roles
                     .Where(r => roleNames.Contains(r.Name))
                     .Select(r => r.Id)
-                    .First();//selectam 1 singur rol
+                    .First(); 
                 return View(user);
             }
         }
@@ -132,7 +136,20 @@ namespace OnlineShop.Controllers
 
             return RedirectToAction("Index");
         }
+        
+        [NonAction]
+        public IQueryable<ApplicationUser> FiltreazaUseriDupaEmail(string? emailSauPrefix)
+        {
+            var query = db.Users.AsQueryable();
 
+            if (string.IsNullOrWhiteSpace(emailSauPrefix))
+                return query;
+
+            var term = emailSauPrefix.Trim();
+
+            // Cautare dupa email sau prefix din email
+            return query.Where(u => u.Email != null && u.Email.StartsWith(term));
+        }
         [NonAction]
         public IEnumerable<SelectListItem> GetAllRoles()
         {

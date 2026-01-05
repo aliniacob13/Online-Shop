@@ -1,61 +1,83 @@
 ﻿@model IEnumerable<OnlineShop.Models.Product>
 
-<h2 class="mb-4">Produsele mele propuse</h2>
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
 
-@if (!Model.Any())
-{
-    <p>Nu ai propus încă niciun produs.</p>
-}
-else
-{
-    foreach (var p in Model)
-    {
-        <div class="card mb-3 p-3">
-
-            <h4>@p.Title</h4>
-            <p>Categorie: @p.Category?.Name</p>
-
-            <p>
-                Status:
-                @if (p.Status == ProductStatus.Approved)
-                {
-                    <span class="badge bg-success">Aprobat</span>
-                }
-                else if (p.Status == ProductStatus.Pending)
-                {
-                    <span class="badge bg-warning text-dark">În așteptare</span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">Respins</span>
-                }
-            </p>
-
-            @*feedback admin daca exista*@
-            @if (!string.IsNullOrEmpty(p.AdminFeedback))
-            {
-                <p class="text-muted"><strong>Feedback admin:</strong> @p.AdminFeedback</p>
-            }
-
-            @*buton de editare doar daca produsul nu este Approved *@
-            @if (p.Status != ProductStatus.Approved)
-            {
-                <div class="d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center">
-                        Editează
-                    </a>
-
-                    <form asp-controller="Products"
-                          asp-action="Delete"
-                          asp-route-id="@p.Id"
-                          method="post"
-                          onsubmit="return confirm('Esti sigur ca vrei sa stergi acest produs?');">
-                        <button type="submit" class="btn btn-danger">Sterge produs</button>
-                    </form>
-                </div>
-
-
-            }
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Produsele mele propuse</h2>
         </div>
-    }
-}
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="surface p-4 text-center apple-muted">
+                Nu ai propus încă niciun produs.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var p in Model)
+                {
+                    <div class="col-12">
+                        <div class="card-apple p-3 p-md-4">
+
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2">
+                                <div>
+                                    <h4 class="mb-1">@p.Title</h4>
+                                    <div class="apple-muted">Categorie: <span class="fw-semibold">@p.Category?.Name</span></div>
+                                </div>
+
+                                <div class="text-md-end">
+                                    @if (p.Status == ProductStatus.Approved)
+                                    {
+                                        <span class="badge bg-success pill px-3">Aprobat</span>
+                                    }
+                                    else if (p.Status == ProductStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark pill px-3">În așteptare</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger pill px-3">Respins</span>
+                                    }
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(p.AdminFeedback))
+                            {
+                                <div class="mt-3 feedback-box">
+                                    <span class="apple-muted fw-semibold">Feedback admin:</span>
+                                    <span class="ms-1">@p.AdminFeedback</span>
+                                </div>
+                            }
+
+                            @if (p.Status != ProductStatus.Approved)
+                            {
+                                <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@p.Id"
+                                       class="btn btn-apple pill px-4">
+                                        Editează
+                                    </a>
+
+                                    <form asp-controller="Products"
+                                          asp-action="Delete"
+                                          asp-route-id="@p.Id"
+                                          method="post"
+                                          onsubmit="return confirm('Esti sigur ca vrei sa stergi acest produs?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger pill px-4 w-100">
+                                            Sterge produs
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

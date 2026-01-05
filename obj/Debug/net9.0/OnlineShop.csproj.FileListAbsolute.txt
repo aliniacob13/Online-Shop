@@ -745,7 +745,6 @@
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/nezrqnk58p-muycvpuwrr.gz
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/v0zgfp0y55-87fc7y1x7t.gz
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/yfc7ypekbg-mlv21k5csn.gz
-/Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/3pxibl6b8i-6att3k3k48.gz
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/0lh7vyprji-61n19gt1b8.gz
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/9l0se7m0eg-xtxxf3hu2r.gz
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/75p789k9yt-bqjiyaj88i.gz
@@ -818,3 +817,5 @@
 /Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/ref/OnlineShop.dll
 /Users/aliniacob/Documents/Projects/OnlineShop/bin/Debug/net9.0/DotNetEnv.dll
 /Users/aliniacob/Documents/Projects/OnlineShop/bin/Debug/net9.0/Sprache.dll
+/Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/3pxibl6b8i-xfxu1knb7b.gz
+/Users/aliniacob/Documents/Projects/OnlineShop/obj/Debug/net9.0/compressed/hq0cuwbcay-7qpecifqzg.gz

@@ -3,44 +3,229 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-@if (SignInManager.IsSignedIn(User))
-{
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <span class="navbar-text me-2">
-                Salut, @(User.Identity?.Name)
-            </span>
-        </li>
-        <li class="nav-item">
-            <form asp-area="Identity"
-                  asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
-                  method="post" class="form-inline">
-                <button type="submit" class="nav-link btn btn-link text-dark">
-                    Log out
-                </button>
-            </form>
-        </li>
-    </ul>
-}
-else
-{
-    
+<style>
+    .account-toggle{
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: .55rem .9rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0,0,0,.12);
+        background: rgba(255,255,255,.75);
+        color: var(--apple-text) !important;
+        text-decoration: none;
+        line-height: 1;
+        white-space: nowrap;
+    }
+    .account-toggle:hover{
+        background: rgba(0,0,0,.04);
+        border-color: rgba(0,0,0,.18);
+        color: var(--apple-text) !important;
+        text-decoration: none;
+    }
 
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-area="Identity"
-               asp-page="/Account/Login">
-                Log in
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-area="Identity"
-               asp-page="/Account/Register">
-                Register
-            </a>
-        </li>
-    </ul>
-}
+    .account-icon{
+        font-size: 1.35rem;
+        line-height: 1;
+    }
+
+    .account-menu{
+        width: 340px;
+        max-width: calc(100vw - 24px);
+        padding: 0;
+        border-radius: 18px;
+        border: 1px solid rgba(0,0,0,.10);
+        box-shadow: 0 12px 40px rgba(0,0,0,.12);
+        overflow: hidden;
+    }
+
+    .account-card{
+        padding: 16px;
+        background: #fff;
+    }
+    .account-header{
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 10px;
+    }
+
+    .account-label{
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .account-input{
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .account-input:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+    }
+
+    .account-password-wrap{
+        position: relative;
+    }
+    .account-eye{
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: rgba(0,0,0,.55);
+        padding: 6px 8px;
+        border-radius: 10px;
+    }
+    .account-eye:hover{
+        background: rgba(0,0,0,.04);
+        color: rgba(0,0,0,.75);
+    }
+
+    .account-actions{
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+    }
+
+    .account-links{
+        margin-top: 10px;
+        display: grid;
+        gap: 6px;
+        text-align: center;
+    }
+    .account-links a{
+        color: var(--apple-text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .account-links a:hover{
+        color: var(--apple-blue);
+    }
+
+    .account-divider{
+        height: 1px;
+        background: rgba(0,0,0,.06);
+        margin: 12px 0;
+    }
+    .nav-apple, .navbar{
+        position: relative;
+        z-index: 1200;
+    }
+
+    .navbar .navbar-collapse{
+        overflow: visible !important;
+    }
+
+    .nav-item.dropdown{
+        position: relative;
+    }
+
+    .account-menu{
+        position: absolute;
+        z-index: 3000;
+    }
+</style>
+
+<ul class="navbar-nav flex-row align-items-center">
+    <li class="nav-item dropdown">
+        <a class="account-toggle dropdown-toggle"
+           href="#"
+           role="button"
+           data-bs-toggle="dropdown"
+           aria-expanded="false">
+            <i class="bi bi-person-circle account-icon"></i>
+            <span>Cont</span>
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-end account-menu">
+            <div class="account-card">
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div class="account-header">Salut, @(User.Identity?.Name)</div>
+
+                    <div class="account-divider"></div>
+
+                    <form asp-area="Identity"
+                          asp-page="/Account/Logout"
+                          asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                          method="post"
+                          class="m-0">
+                        <button type="submit" class="btn btn-apple pill w-100">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Log out
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="account-header">Introdu adresa de email <span class="text-danger">*</span></div>
+
+                    <form asp-area="Identity"
+                          asp-page="/Account/Login"
+                          method="post"
+                          class="m-0">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="returnUrl"
+                               value="@Url.Action("Index", "Home", new { area = "" })" />
+
+                        <div class="mb-3">
+                            <input class="form-control account-input"
+                                   type="email"
+                                   name="Input.Email"
+                                   placeholder="Introdu adresa de email"
+                                   autocomplete="email"
+                                   required />
+                        </div>
+
+                        <div class="account-label">Parola <span class="text-danger">*</span></div>
+
+                        <div class="mb-2 account-password-wrap">
+                            <input class="form-control account-input"
+                                   id="accountPassword"
+                                   type="password"
+                                   name="Input.Password"
+                                   placeholder="Parola"
+                                   autocomplete="current-password"
+                                   required />
+                            <button type="button" class="account-eye" id="accountTogglePwd" aria-label="Arata parola">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+
+                        <div class="account-actions">
+                            <button type="submit" class="btn btn-apple pill w-100">
+                                Autentificare
+                            </button>
+                        </div>
+
+                        <div class="account-links">
+                            <a asp-area="Identity" asp-page="/Account/ForgotPassword">Recuperare parola</a>
+                            <a asp-area="Identity" asp-page="/Account/Register">Inregistrare</a>
+                        </div>
+                    </form>
+                }
+
+            </div>
+        </div>
+    </li>
+</ul>
+
+<script>
+    (function () {
+        var btn = document.getElementById("accountTogglePwd");
+        var input = document.getElementById("accountPassword");
+        if (!btn || !input) return;
+
+        btn.addEventListener("click", function () {
+            var isPwd = input.type === "password";
+            input.type = isPwd ? "text" : "password";
+            btn.innerHTML = isPwd ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+        });
+    })();
+</script>

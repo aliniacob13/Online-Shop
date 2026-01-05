@@ -1,42 +1,107 @@
 @model OnlineShop.Models.ApplicationUser
-<form asp-controller="Users" asp-action="Edit" method="post" asp-route-id="@Model.Id">
-    <i class="bi bi-person"></i>
-    <label asp-for="UserName">Nume utilizator</label>
-    <br />
-    <input asp-for="UserName" class="form-control" />
-    <br />
-    
-    <i class="bi bi-envelope"></i>
-    <label asp-for="Email">Email utilizator</label>
-    <br />
-    <input asp-for="Email" class="form-control" />
-    <br />
-    
-    <i class="bi bi-phone"></i>
-    <label asp-for="FirstName">Nume utilizator</label>
-    <br/>
-    <input asp-for="FirstName" class="form-control" />
-    <br/>
-    <i class="bi bi-person"></i>
-    <label asp-for="LastName">Prenume utilizator</label>
-    <input asp-for="LastName" class="form-control" />
-    <br />
-    <i class="bi bi-card-list"></i>
-    <label>Selectati rolul</label>
-    <br/>
-    <select name="newRole" class="form-control">
-        <option selected>Selectati rolul</option>
-        @foreach (var role in ViewBag.AllRoles)
-        {
-            @if (ViewBag.UserRole == role.Value)
-            {
-                <option selected="selected" value="@role.Value">@role.Text</option>
-            }
-            else
-            {
-                <option value="@role.Value">@role.Text</option>
-            }
-        }
-    </select>
-    <button type="submit" class="btn btn-primary">Editare user</button>
-</form>
+
+<style>
+    .user-wrap{ max-width: 920px; }
+    .field-row{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+        color: var(--apple-text);
+        font-weight: 600;
+    }
+    .hint{ font-size: .875rem; color: var(--apple-muted); }
+
+    .form-control, .form-select{
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .form-control:focus, .form-select:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 user-wrap">
+
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Editare user</h2>
+            <div class="apple-muted">Actualizeaza datele utilizatorului si rolul.</div>
+        </div>
+
+        <div class="surface p-3 p-md-4">
+            <form asp-controller="Users" asp-action="Edit" method="post" asp-route-id="@Model.Id">
+
+                <div class="mb-3">
+                    <div class="field-row">
+                        <i class="bi bi-person"></i>
+                        <label asp-for="UserName" class="form-label m-0">Nume utilizator</label>
+                    </div>
+                    <input asp-for="UserName" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <div class="field-row">
+                        <i class="bi bi-envelope"></i>
+                        <label asp-for="Email" class="form-label m-0">Email utilizator</label>
+                    </div>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <div class="field-row">
+                                <i class="bi bi-person"></i>
+                                <label asp-for="FirstName" class="form-label m-0">Nume utilizator</label>
+                            </div>
+                            <input asp-for="FirstName" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <div class="field-row">
+                                <i class="bi bi-person"></i>
+                                <label asp-for="LastName" class="form-label m-0">Prenume utilizator</label>
+                            </div>
+                            <input asp-for="LastName" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="field-row">
+                        <i class="bi bi-card-list"></i>
+                        <label class="form-label m-0">Selectati rolul</label>
+                    </div>
+
+                    <select name="newRole" class="form-select">
+                        <option selected>Selectati rolul</option>
+                        @foreach (var role in ViewBag.AllRoles)
+                        {
+                            @if (ViewBag.UserRole == role.Value)
+                            {
+                                <option selected="selected" value="@role.Value">@role.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@role.Value">@role.Text</option>
+                            }
+                        }
+                    </select>
+
+                    <div class="hint mt-1">Schimbarea rolului afecteaza permisiunile in aplicatie.</div>
+                </div>
+
+                <button type="submit" class="btn btn-apple pill px-4">
+                    Editare user
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>

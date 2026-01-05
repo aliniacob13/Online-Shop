@@ -5,63 +5,210 @@
     decimal total = 0;
 }
 
-<h2>Cosul meu</h2>
+<style>
+    :root{
+        --apple-bg: #f5f5f7;
+        --apple-surface: #ffffff;
+        --apple-text: #1d1d1f;
+        --apple-muted: #6e6e73;
+        --apple-border: rgba(0,0,0,.10);
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-radius: 18px;
+        --apple-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">Cosul este gol.</div>
-}
-else
-{
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Produs</th>
-                <th>Pret unitar</th>
-                <th>Cantitate</th>
-                <th>Subtotal</th>
-                <th>Actiuni</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                var subtotal = item.Quantity * item.Product.Price;
-                total += subtotal;
-                <tr>
-                    <td>
-                        <img src="@item.Product.ImageUrl" alt="@item.Product.Title" width="80" class="img-thumbnail" />
-                        <br />
-                        @item.Product.Title
-                    </td>
-                    <td>@item.Product.Price.ToString("C")</td>
-                    <td>
-                        <form asp-action="UpdateQuantity" method="post" class="d-flex">
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control me-2" style="width:80px;" />
-                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                        </form>
-                    </td>
-                    <td>@subtotal.ToString("C")</td>
-                    <td>
-                        <form asp-action="Remove" method="post">
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <button type="submit" class="btn btn-danger btn-sm">Sterge</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                <td colspan="2"><strong>@total.ToString("C")</strong></td>
-            </tr>
-        </tfoot>
-    </table>
+    .apple-admin{
+        background: var(--apple-bg);
+        min-height: calc(100vh - 56px);
+    }
 
-    <form asp-action="Checkout" method="post">
-        <button type="submit" class="btn btn-success">Plaseaza comanda</button>
-    </form>
-}
+    .apple-wrap{ max-width: 1100px; }
+    .apple-title{ letter-spacing: -0.02em; }
+    .apple-muted{ color: var(--apple-muted); }
 
+    .surface{
+        background: var(--apple-surface);
+        border: 1px solid var(--apple-border);
+        border-radius: var(--apple-radius);
+        box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+
+    .pill{ border-radius: 999px; }
+
+    .table-apple{
+        margin: 0;
+    }
+    .table-apple thead th{
+        font-weight: 600;
+        color: var(--apple-text);
+        border-bottom: 1px solid rgba(0,0,0,.08);
+        padding-top: 14px;
+        padding-bottom: 14px;
+        background: transparent;
+        white-space: nowrap;
+    }
+    .table-apple tbody td{
+        border-top: 1px solid rgba(0,0,0,.06);
+        vertical-align: middle;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+    .table-apple tbody tr:hover{
+        background: rgba(0,0,0,.02);
+    }
+
+    .produs-cell{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 240px;
+    }
+    .produs-img{
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,.08);
+        background: #fff;
+    }
+
+    .qty-input{
+        width: 88px;
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .5rem;
+        padding-bottom: .5rem;
+    }
+    .qty-input:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+    }
+
+    .btn-apple{
+        background: var(--apple-blue);
+        border-color: var(--apple-blue);
+        color: #fff;
+    }
+    .btn-apple:hover{
+        background: var(--apple-blue-hover);
+        border-color: var(--apple-blue-hover);
+        color: #fff;
+    }
+
+    .btn-apple-outline{
+        border-color: rgba(0,0,0,.18);
+        color: var(--apple-text);
+        background: #fff;
+    }
+    .btn-apple-outline:hover{
+        background: rgba(0,0,0,.04);
+        border-color: rgba(0,0,0,.22);
+        color: var(--apple-text);
+    }
+
+    .total-box{
+        border-top: 1px solid rgba(0,0,0,.08);
+        padding-top: 14px;
+        margin-top: 12px;
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Cosul meu</h2>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="surface p-4 text-center apple-muted">
+                Cosul este gol.
+            </div>
+        }
+        else
+        {
+            <div class="surface p-2 p-md-3">
+                <div class="table-responsive">
+                    <table class="table table-apple align-middle">
+                        <thead>
+                            <tr>
+                                <th>Produs</th>
+                                <th>Pret unitar</th>
+                                <th>Cantitate</th>
+                                <th>Subtotal</th>
+                                <th class="text-end">Actiuni</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var subtotal = item.Quantity * item.Product.Price;
+                                total += subtotal;
+
+                                <tr>
+                                    <td>
+                                        <div class="produs-cell">
+                                            <img src="@item.Product.ImageUrl"
+                                                 alt="@item.Product.Title"
+                                                 class="produs-img" />
+                                            <div class="fw-semibold">@item.Product.Title</div>
+                                        </div>
+                                    </td>
+
+                                    <td class="fw-semibold">@item.Product.Price.ToString("C")</td>
+
+                                    <td>
+                                        <form asp-action="UpdateQuantity" method="post" class="d-flex align-items-center gap-2">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="number"
+                                                   name="quantity"
+                                                   value="@item.Quantity"
+                                                   min="1"
+                                                   class="form-control qty-input"
+                                                   aria-label="Cantitate" />
+                                            <button type="submit" class="btn btn-apple btn-sm pill px-3">
+                                                Update
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                    <td class="fw-semibold">@subtotal.ToString("C")</td>
+
+                                    <td class="text-end">
+                                        <form asp-action="Remove" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm pill px-3">
+                                                Sterge
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td colspan="2"><strong>@total.ToString("C")</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 total-box">
+                    <div class="apple-muted">Totalul se recalculează după update.</div>
+
+                    <form asp-action="Checkout" method="post" class="m-0">
+                        <button type="submit" class="btn btn-success pill px-4">
+                            Plasează comanda
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

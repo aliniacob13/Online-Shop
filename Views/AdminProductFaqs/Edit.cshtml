@@ -3,27 +3,38 @@
     ViewData["Title"] = "Editeaza FAQ";
 }
 
-<h2>Editeaza FAQ</h2>
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap" style="max-width: 900px;">
 
-<form method="post">
-    @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Editeaza FAQ</h2>
+            <div class="apple-muted">Actualizeaza intrebarea, raspunsul si statusul de aprobare.</div>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="Question" class="form-label"></label>
-        <input asp-for="Question" class="form-control" />
-        <span asp-validation-for="Question" class="text-danger"></span>
+        <div class="surface p-3 p-md-4">
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Question" class="form-label"></label>
+                    <input asp-for="Question" class="form-control" placeholder="Ex: Are garantie?" />
+                    <span asp-validation-for="Question" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Answer" class="form-label"></label>
+                    <textarea asp-for="Answer" class="form-control" rows="4" placeholder="Scrie un raspuns clar si util."></textarea>
+                    <span asp-validation-for="Answer" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" asp-for="IsApproved" />
+                    <label class="form-check-label" asp-for="IsApproved">Aprobat</label>
+                </div>
+
+                <button class="btn btn-apple pill px-4" type="submit">Salveaza</button>
+            </form>
+        </div>
+
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Answer" class="form-label"></label>
-        <textarea asp-for="Answer" class="form-control" rows="4"></textarea>
-        <span asp-validation-for="Answer" class="text-danger"></span>
-    </div>
-
-    <div class="form-check mb-3">
-        <input class="form-check-input" asp-for="IsApproved" />
-        <label class="form-check-label" asp-for="IsApproved">Aprobat</label>
-    </div>
-
-    <button class="btn btn-primary" type="submit">Salveaza</button>
-</form>
+</div>

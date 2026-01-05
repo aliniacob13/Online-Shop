@@ -114,7 +114,7 @@ namespace OnlineShop.Controllers
             return RedirectToAction("Show", "Products", new { id = productId });
         }
 
-        // Editare review (GET)
+        // Editare review 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -137,7 +137,7 @@ namespace OnlineShop.Controllers
             return View(review);
         }
 
-        // Editare review (POST)
+        // Editare review 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Review requestedReview)

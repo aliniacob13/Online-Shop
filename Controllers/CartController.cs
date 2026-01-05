@@ -80,7 +80,7 @@ namespace OnlineShop.Controllers
             return RedirectToAction("Index", "Products");
         }
 
-        // --- Adauga produs in cart dupa login (apelata prin GET cu returnUrl) ---
+        //Adauga produs in cart dupa login 
         [HttpGet]
         public async Task<IActionResult> AddAfterLogin(int productId, int quantity = 1)
         {
@@ -127,7 +127,6 @@ namespace OnlineShop.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- Sterge produs din cart ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Remove(int id)
@@ -147,7 +146,7 @@ namespace OnlineShop.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- Update cantitate ---
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateQuantity(int id, int quantity)
@@ -183,7 +182,6 @@ namespace OnlineShop.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //Checkout (fictiv) 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout()

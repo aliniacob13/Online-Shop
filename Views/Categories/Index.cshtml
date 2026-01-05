@@ -1,81 +1,182 @@
 @model IEnumerable<OnlineShop.Models.Category>
 
-<h1>Lista Categorii</h1>
-
-@if (TempData["message"] != null)
-{
-    <div class="alert alert-info">
-        @TempData["message"]
-    </div>
+@{
+    bool canManage = User.IsInRole("Admin") || User.IsInRole("Editor");
 }
 
-@if (User.IsInRole("Admin") || User.IsInRole("Editor"))
-{
-    <p>
-        <a asp-action="New" class="btn btn-primary">Adauga categorie noua</a>
-    </p>
-}
+<style>
+    :root{
+        --apple-bg: #f5f5f7;
+        --apple-surface: #ffffff;
+        --apple-text: #1d1d1f;
+        --apple-muted: #6e6e73;
+        --apple-border: rgba(0,0,0,.10);
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-radius: 18px;
+        --apple-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
 
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>Nume Categorie</th>
-            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
-            { 
-                <th>Actiuni</th>
-            }
-            else
+    .apple-admin{
+        background: var(--apple-bg);
+        min-height: calc(100vh - 56px);
+    }
+
+    .apple-wrap{ max-width: 1100px; }
+    .apple-title{ letter-spacing: -0.02em; }
+    .apple-muted{ color: var(--apple-muted); }
+    .pill{ border-radius: 999px; }
+
+    .surface{
+        background: var(--apple-surface);
+        border: 1px solid var(--apple-border);
+        border-radius: var(--apple-radius);
+        box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+
+    .btn-apple{
+        background: var(--apple-blue);
+        border-color: var(--apple-blue);
+        color: #fff;
+    }
+    .btn-apple:hover{
+        background: var(--apple-blue-hover);
+        border-color: var(--apple-blue-hover);
+        color: #fff;
+    }
+
+    .btn-apple-outline{
+        border-color: rgba(0,0,0,.18);
+        color: var(--apple-text);
+        background: #fff;
+    }
+    .btn-apple-outline:hover{
+        background: rgba(0,0,0,.04);
+        border-color: rgba(0,0,0,.22);
+        color: var(--apple-text);
+    }
+
+    .table-apple{
+        margin: 0;
+    }
+    .table-apple thead th{
+        font-weight: 600;
+        color: var(--apple-text);
+        border-bottom: 1px solid rgba(0,0,0,.08);
+        padding-top: 14px;
+        padding-bottom: 14px;
+        background: transparent;
+    }
+    .table-apple tbody td{
+        border-top: 1px solid rgba(0,0,0,.06);
+        vertical-align: middle;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+    .table-apple tbody tr:hover{
+        background: rgba(0,0,0,.02);
+    }
+
+    .actions-col{ width: 260px; }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3 mb-3">
+            <div>
+                <h1 class="apple-title mb-1">Listă categorii</h1>
+                <div class="apple-muted">
+                    @(canManage ? "Administrează categoriile din magazin." : "Alege o categorie ca sa vezi produsele.")
+                </div>
+            </div>
+
+            @if (canManage)
             {
-                <th>Vezi produsele!</th>
+                <a asp-action="New" class="btn btn-apple pill px-4">
+                    Adaugă categorie noua
+                </a>
             }
-        </tr>
-    </thead>
-    <tbody>
-    @if (Model == null || !Model.Any())
-    {
-        <tr>
-            <td colspan="2" class="text-center">Nu sunt categorii.</td>
-        </tr>
-    }
-    else
-    {
-        foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
-                    {
-                        <a asp-action="Edit"
-                           asp-route-id="@item.Id"
-                           class="btn btn-sm btn-warning">
-                            Editeaza
-                        </a>
+        </div>
 
-                        <form asp-action="Delete"
-                              asp-route-id="@item.Id"
-                              method="post"
-                              class="d-inline"
-                              onsubmit="return confirm('Sigur vrei să ștergi categoria?');">
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Sterge
-                            </button>
-                            </form>
-                        }
-                        else //utilizatorul poate filtra produsele in functie de categorie
-                        {
-                            <a asp-controller="Products"
-                               asp-action="Index"
-                               asp-route-categoryId="@item.Id"
-                               class="btn btn-sm btn-info">
-                                Produse
-                            </a>
-                        }
-                </td>
-            </tr>
+        @if (TempData["message"] != null)
+        {
+            <div class="alert alert-info surface mb-3">
+                @TempData["message"]
+            </div>
         }
-    }
-    </tbody>
-</table>
+
+        <div class="surface p-2 p-md-3">
+            <div class="table-responsive">
+                <table class="table table-apple align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nume categorie</th>
+                            @if (canManage)
+                            {
+                                <th class="text-end actions-col">Acțiuni</th>
+                            }
+                            else
+                            {
+                                <th class="text-end actions-col">Vezi produsele</th>
+                            }
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center apple-muted py-4">Nu sunt categorii.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @item.Name
+                                    </td>
+
+                                    <td class="text-end">
+                                        @if (canManage)
+                                        {
+                                            <div class="d-inline-flex gap-2">
+                                                <a asp-action="Edit"
+                                                   asp-route-id="@item.Id"
+                                                   class="btn btn-apple-outline btn-sm pill px-3">
+                                                    Editează
+                                                </a>
+
+                                                <form asp-action="Delete"
+                                                      asp-route-id="@item.Id"
+                                                      method="post"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Sigur vrei să ștergi categoria?');">
+                                                    <button type="submit" class="btn btn-danger btn-sm pill px-3">
+                                                        Șterge
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Products"
+                                               asp-action="Index"
+                                               asp-route-categoriiSelectate="@item.Id"
+                                               class="btn btn-apple pill px-4">
+                                                Produse
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

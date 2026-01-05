@@ -1,65 +1,150 @@
 @model IEnumerable<OnlineShop.Models.ProductFaq>
 
-    @{
+@{
     ViewData["Title"] = "Admin FAQ";
     int? pid = ViewBag.ProductId as int?;
 }
 
-<h2>FAQ produse</h2>
-
-@if (TempData["message"] != null)
-{
-    <div class="alert alert-info">@TempData["message"]</div>
-}
-
-<a class="btn btn-outline-secondary mb-3"
-   asp-controller="AdminTopQuestions"
-   asp-action="Index">
-    Inapoi la Top intrebari
-</a>
-
-@if (pid.HasValue)
-{
-    <a class="btn btn-primary mb-3" asp-action="Create" asp-route-productId="@pid.Value">Adauga FAQ</a>
-}
-else
-{
-    <div class="alert alert-warning">Trimite productId in URL ca sa administrezi FAQ pe un produs.</div>
-}
-
-<table class="table table-striped">
-    <thead>
-    <tr>
-    <th>Produs</th>
-    <th>Intrebare</th>
-    <th>Aprobat</th>
-    <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var f in Model)
-    {
-        <tr>
-            <td>@f.Product?.Title (@f.ProductId)</td>
-            <td>@f.Question</td>
-            <td>@(f.IsApproved ? "DA" : "NU")</td>
-            <td class="text-end">
-                <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@f.Id">Editeaza</a>
-
-                <form asp-action="ToggleApprove" asp-route-id="@f.Id" method="post" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button class="btn btn-sm btn-secondary" type="submit">
-                        @(f.IsApproved ? "Dezaproba" : "Aproba")
-                    </button>
-                </form>
-
-                <form asp-action="Delete" asp-route-id="@f.Id" method="post" class="d-inline"
-                      onsubmit="return confirm('Sigur stergi FAQ-ul?');">
-                    @Html.AntiForgeryToken()
-                    <button class="btn btn-sm btn-danger" type="submit">Sterge</button>
-                </form>
-            </td>
-        </tr>
+<style>
+    .table-apple{
+        margin: 0;
     }
-    </tbody>
-    </table>
+    .table-apple thead th{
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0,0,0,.08);
+        padding-top: 14px;
+        padding-bottom: 14px;
+        background: transparent;
+        white-space: nowrap;
+    }
+    .table-apple tbody td{
+        border-top: 1px solid rgba(0,0,0,.06);
+        vertical-align: middle;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+    .table-apple tbody tr:hover{
+        background: rgba(0,0,0,.02);
+    }
+
+    .status-chip{
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        border: 1px solid rgba(0,0,0,.10);
+        background: rgba(0,0,0,.02);
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-end gap-3 mb-3">
+            <div>
+                <h2 class="apple-title mb-1">FAQ produse</h2>
+                <div class="apple-muted">
+                    Administreaza intrebarile si raspunsurile pentru produs.
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <a class="btn btn-apple-outline pill px-4"
+                   asp-controller="AdminTopQuestions"
+                   asp-action="Index">
+                    Inapoi la Top intrebari
+                </a>
+
+                @if (pid.HasValue)
+                {
+                    <a class="btn btn-apple pill px-4"
+                       asp-action="Create"
+                       asp-route-productId="@pid.Value">
+                        Adauga FAQ
+                    </a>
+                }
+            </div>
+        </div>
+
+        @if (TempData["message"] != null)
+        {
+            <div class="surface p-3 mb-3">
+                @TempData["message"]
+            </div>
+        }
+
+        @if (!pid.HasValue)
+        {
+            <div class="surface p-3 mb-3">
+                Trimite productId in URL ca sa administrezi FAQ pe un produs.
+            </div>
+        }
+
+        <div class="surface p-2 p-md-3">
+            <div class="table-responsive">
+                <table class="table table-apple align-middle">
+                    <thead>
+                        <tr>
+                            <th>Produs</th>
+                            <th>Intrebare</th>
+                            <th>Aprobat</th>
+                            <th class="text-end">Actiuni</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var f in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @f.Product?.Title <span class="apple-muted">(@f.ProductId)</span>
+                                </td>
+
+                                <td>@f.Question</td>
+
+                                <td>
+                                    <span class="status-chip">
+                                        @(f.IsApproved ? "DA" : "NU")
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+                                    <div class="d-inline-flex flex-wrap gap-2 justify-content-end">
+                                        <a class="btn btn-sm btn-apple-outline pill px-3"
+                                           asp-action="Edit"
+                                           asp-route-id="@f.Id">
+                                            Editeaza
+                                        </a>
+
+                                        <form asp-action="ToggleApprove"
+                                              asp-route-id="@f.Id"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-secondary pill px-3" type="submit">
+                                                @(f.IsApproved ? "Dezaproba" : "Aproba")
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="Delete"
+                                              asp-route-id="@f.Id"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Sigur stergi FAQ-ul?');">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-danger pill px-3" type="submit">
+                                                Sterge
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

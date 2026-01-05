@@ -5,147 +5,237 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - OnlineShop</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/apple-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OnlineShop.styles.css" asp-append-version="true" />
+
+    <style>
+        .nav-apple {
+            background: rgba(255,255,255,.85);
+            backdrop-filter: saturate(180%) blur(14px);
+            border-bottom: 1px solid rgba(0,0,0,.06);
+        }
+        .brand-apple {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-link-apple {
+            color: var(--apple-text) !important;
+            border-radius: 999px;
+            padding: .45rem .8rem !important;
+            font-weight: 600;
+        }
+        .nav-link-apple:hover {
+            background: rgba(0,0,0,.04);
+            color: var(--apple-text) !important;
+        }
+
+        .nav-icon-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-icon {
+            font-size: 1.1rem;
+            color: rgba(0,0,0,.65);
+        }
+
+        .actions-menu {
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,.10);
+            box-shadow: 0 12px 40px rgba(0,0,0,.12);
+            padding: 8px;
+            min-width: 260px;
+        }
+        .actions-menu .dropdown-item {
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-weight: 600;
+        }
+        .actions-menu .dropdown-item:hover {
+            background: rgba(0,0,0,.04);
+        }
+        .actions-menu .dropdown-item i {
+            color: rgba(0,0,0,.55);
+            margin-right: 10px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OnlineShop</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light nav-apple mb-3">
+        <div class="container-fluid">
+            <a class="navbar-brand brand-apple" asp-area="" asp-controller="Home" asp-action="Index">OnlineShop</a>
 
-                        @* Meniu pentru vizitatori (neautentificati) *@
-                        @if (User.Identity == null || !User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area=""
-                                   asp-controller="Products"
-                                   asp-action="Index">
-                                    Afisare produse
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-area=""
-                                   asp-controller="Categories"
-                                   asp-action="Index">
-                                    Afisare categorii
-                                </a>
-                            </li>
-                        }
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                        @if (User.IsInRole("Admin"))
+            <div class="navbar-collapse collapse" id="mainNavbar">
+
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
+
+                    @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Home" asp-action="Index">Acasă</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Products" asp-action="Index">Produse</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Categories" asp-action="Index">Categorii</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Home" asp-action="Index">Acasă</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Products" asp-action="Index">Produse</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Categories" asp-action="Index">Categorii</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple" asp-area="" asp-controller="Orders" asp-action="Index">Comenzile mele</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-apple nav-icon-link"
+                               asp-area="" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart2 nav-icon"></i>
+                                <span>Cosul meu</span>
+                            </a>
+                        </li>
+
+                        @if (User.IsInRole("Editor") || User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Afisare produse</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Create">Adaugare produs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Afisare categorii</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="New">Adaugare categorii</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Afisare utilizatori</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="PendingProducts">Produse in astepare</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cos de cumparaturi</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Comenzile mele</a>
-                            </li>
-                        
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="AdminTopQuestions" asp-action="Index">Top intrebari</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link nav-link-apple dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    Actiuni
+                                </a>
+
+                                <ul class="dropdown-menu actions-menu dropdown-menu-start">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-area=""
+                                           asp-controller="Products"
+                                           asp-action="Create">
+                                            <i class="bi bi-plus-circle"></i> Adaugare produs
+                                        </a>
+                                    </li>
+
+                                    @if (User.IsInRole("Editor"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Products"
+                                               asp-action="ProposedProducts">
+                                                <i class="bi bi-lightbulb"></i> Produse propuse
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Categories"
+                                               asp-action="New">
+                                                <i class="bi bi-folder-plus"></i> Adaugare categorie
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Users"
+                                               asp-action="Index">
+                                                <i class="bi bi-people"></i> Utilizatori
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Products"
+                                               asp-action="PendingProducts">
+                                                <i class="bi bi-hourglass-split"></i> Produse in asteptare
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="AdminTopQuestions"
+                                               asp-action="Index">
+                                                <i class="bi bi-question-circle"></i> Top intrebari
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
                             </li>
                         }
-                        @if (User.IsInRole("Editor"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Afisare produse</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Create">Adaugare produs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cos de cumparaturi</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Comenzile mele</a>
-                            </li>
-                        }
-                        @if (User.IsInRole("User"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Afisare categorii</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Afisare produse</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cos de cumparaturi</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Comenzile mele</a>
-                            </li>
-                        }
-                    </ul>
+                    }
+                </ul>
+
+                <div class="nav-right">
                     <partial name="_LoginPartial" />
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @* mesaj global din TempData, afisat pe prima pagina dupa redirect *@
-            @if (TempData["message"] != null)
-            {
-                var tip = TempData["messagetype"] as string ?? "alert-info";
-                <div class="alert @tip alert-dismissible fade show mt-2" role="alert">
-                    @TempData["message"]
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="alert"
-                            aria-label="Close"></button>
-                </div>
-            }
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - OnlineShop - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </nav>
+</header>
+
+<div class="container">
+    <main role="main" class="pb-3">
+        @if (TempData["message"] != null)
+        {
+            var tip = TempData["messagetype"] as string ?? "alert-info";
+            <div class="alert @tip alert-dismissible fade show mt-2" role="alert">
+                @TempData["message"]
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2025 - OnlineShop - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

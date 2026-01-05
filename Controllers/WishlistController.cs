@@ -22,7 +22,7 @@ namespace OnlineShop.Controllers
             _userManager = userManager;
         }
 
-        // --- Afisare wishlist ---
+        
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
@@ -33,7 +33,6 @@ namespace OnlineShop.Controllers
             return View(items);
         }
 
-        // --- Adauga in wishlist (POST, cand userul e deja logat) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId)
@@ -59,7 +58,6 @@ namespace OnlineShop.Controllers
             return RedirectToAction("Index", "Products");
         }
 
-        // --- Adauga in wishlist dupa login (GET, folosit cu returnUrl) ---
         [HttpGet]
         public async Task<IActionResult> AddAfterLogin(int productId)
         {
@@ -81,12 +79,10 @@ namespace OnlineShop.Controllers
                 TempData["message"] = "Produsul a fost adaugat in wishlist.";
                 TempData["messagetype"] = "alert-success";
             }
-
-            // Dupa login, ducem utilizatorul direct la wishlist-ul lui
+            //redirect la wishlist
             return RedirectToAction(nameof(Index));
         }
 
-        // --- Sterge din wishlist ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Remove(int id)
@@ -107,7 +103,6 @@ namespace OnlineShop.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- Mutare in cart ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MoveToCart(int id)

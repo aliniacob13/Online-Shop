@@ -1,48 +1,140 @@
-<br />
-<br />
+@{
+    var emailSearch = ViewBag.EmailSearch as string ?? "";
+}
 
-<div class="row">
-    @foreach (var user in ViewBag.UsersList)
-    {
-        <div class="col-4 mb-4">
-            <div class="card" style="height:100%; width: 100%;">
-        
-                <div class="card-body d-flex justify-content-between flex-column">
-                    <div>
-                        <p><i class="bi bi-person"> </i> UserName: @user.UserName</p>
+<style>
+    .users-grid-card{
+        border: 1px solid rgba(0,0,0,.08);
+        border-radius: 18px;
+        background: #fff;
+        transition: transform .15s ease, box-shadow .15s ease;
+        height: 100%;
+    }
+    .users-grid-card:hover{
+        transform: translateY(-2px);
+        box-shadow: var(--apple-shadow);
+    }
 
-                        <p><i class="bi bi-envelope"></i> Email utilizator: @user.Email</p>
+    .user-line{
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin: 0 0 10px 0;
+    }
+    .user-line i{
+        color: rgba(0,0,0,.55);
+        margin-top: 2px;
+    }
+    .user-label{
+        color: var(--apple-muted);
+        margin-right: 6px;
+        white-space: nowrap;
+    }
 
+    .search-wrap{
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .search-input{
+        flex: 1 1 280px;
+        min-width: 220px;
+    }
+</style>
 
-                        @if (@user.FirstName != null)
-                        {
-                            <p><i class="bi bi-person"> </i> Nume utilizator: @user.FirstName</p>
-                        }
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
 
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Utilizatori</h2>
+            <div class="apple-muted">Administrare utilizatori</div>
+        </div>
 
-                        @if (@user.LastName != null)
-                        {
-                            <p><i class="bi bi-person"> </i> Prenume utilizator: @user.LastName</p>
-                        }
-
-                        
+        <div class="surface p-3 mb-3">
+            <form method="get" asp-controller="Users" asp-action="Index" class="m-0">
+                <div class="search-wrap">
+                    <div class="search-input">
+                        <input type="text"
+                               name="email"
+                               value="@emailSearch"
+                               class="form-control pill"
+                               placeholder="Cauta dupa email" />
                     </div>
-                    <div class="d-flex flex-row justify-content-between p-3">
 
-                        <div>
-                            <a asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-success">Editare utilizator</a>
+                    <button type="submit" class="btn btn-apple pill px-4">
+                        Cauta
+                    </button>
+
+                    <a class="btn btn-apple-outline pill px-4"
+                       asp-controller="Users"
+                       asp-action="Index">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-3">
+            @foreach (var user in ViewBag.UsersList)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="users-grid-card p-3 p-md-4">
+
+                        <div class="mb-3">
+                            <div class="fw-semibold" style="font-size: 1.05rem;">
+                                @user.UserName
+                            </div>
                         </div>
 
-                        <div>
-                            <a asp-controller="Users" asp-action="Show" asp-route-id="@user.Id" class="btn btn-sm btn-success">Vizualizare utilizator</a>
+                        <div class="mb-3">
+                            <p class="user-line">
+                                <i class="bi bi-person"></i>
+                                <span><span class="user-label">UserName:</span> @user.UserName</span>
+                            </p>
+
+                            <p class="user-line">
+                                <i class="bi bi-envelope"></i>
+                                <span><span class="user-label">Email:</span> @user.Email</span>
+                            </p>
+
+                            @if (user.FirstName != null)
+                            {
+                                <p class="user-line">
+                                    <i class="bi bi-person"></i>
+                                    <span><span class="user-label">Nume:</span> @user.FirstName</span>
+                                </p>
+                            }
+
+                            @if (user.LastName != null)
+                            {
+                                <p class="user-line">
+                                    <i class="bi bi-person"></i>
+                                    <span><span class="user-label">Prenume:</span> @user.LastName</span>
+                                </p>
+                            }
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-auto">
+                            <a asp-controller="Users"
+                               asp-action="Edit"
+                               asp-route-id="@user.Id"
+                               class="btn btn-apple pill px-4 w-100">
+                                Editare utilizator
+                            </a>
+
+                            <a asp-controller="Users"
+                               asp-action="Show"
+                               asp-route-id="@user.Id"
+                               class="btn btn-apple-outline pill px-4 w-100">
+                                Vizualizare utilizator
+                            </a>
                         </div>
 
                     </div>
                 </div>
-            </div>
+            }
         </div>
-    }
-</div>
 
-<br />
-<br />
+    </div>
+</div>

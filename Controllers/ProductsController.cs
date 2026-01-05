@@ -54,7 +54,7 @@ public class ProductsController : Controller
         }
         else
         {
-            // Verificăm extensia (să fie doar imagine)
+            // Verificam extensia (să fie doar imagine)
             ModelState.Remove("ImageUrl");
             string extension = Path.GetExtension(imageFile.FileName).ToLower();
             string[] permittedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
@@ -64,7 +64,7 @@ public class ProductsController : Controller
                 ModelState.AddModelError("ImageUrl", "Format invalid. Doar .jpg, .jpeg, .png, .gif sunt acceptate.");
             }
 
-            // Verificăm dimensiunea (ex: max 5 MB) - Cerința ta din imagine
+            // Verificăm dimensiunea 
             if (imageFile.Length > 5 * 1024 * 1024) 
             {
                  ModelState.AddModelError("ImageUrl", "Imaginea este prea mare. Maxim 5MB.");
@@ -72,7 +72,7 @@ public class ProductsController : Controller
         }
 
         // Deoarece Category este null (vine doar CategoryId din form), 
-        // trebuie să scoatem eroarea de validare automată pentru obiectul Category
+        // trebuie sa scoatem eroarea de validare automată pentru obiectul Category
         ModelState.Remove("Category"); 
         product.UserId = _userManager.GetUserId(User);
 
@@ -93,16 +93,13 @@ public class ProductsController : Controller
 
         if (ModelState.IsValid)
         {
-            // -- 2. SALVARE FIZICĂ A IMAGINII --
             
-            // Generăm un nume unic fișierului pentru a evita duplicatele
-            // Ex: "laptop.jpg" devine "guid-unic-laptop.jpg"
+            // Generam un nume unic fisierului pentru a evita duplicatele
             string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
             
             // Compunem calea unde o salvăm: wwwroot/images
             string uploadsFolder = Path.Combine(whe.WebRootPath, "images");
             
-            // Dacă folderul nu există, îl creăm (opțional, dar bun pentru siguranță)
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
@@ -110,24 +107,23 @@ public class ProductsController : Controller
 
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // Copiem fișierul primit în calea definită
+            // Copiem fisierul primit in calea definita
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(fileStream);
             }
 
-            // -- 3. SALVARE ÎN BAZA DE DATE --
+            //Salvare in baza de date
             
-            // Salvăm doar calea relativă în obiectul produs
+            // doar calea relativă în obiectul produs
             product.ImageUrl = "/images/" + uniqueFileName;
 
             db.Add(product);
             TempData["message"] = "Produsul a fost adaugat cu succes!";
             await db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index)); // Ne întoarcem la listă
+            return RedirectToAction(nameof(Index)); 
         }
 
-        // Dacă ceva a mers prost, reîncărcăm lista de categorii și reafisam formularul
         ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", product.CategoryId);
         return View(product);
     }
@@ -179,7 +175,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
         ViewBag.CategoryName = "Toate produsele";
     }
 
-    // Căutare
+    // Cautare
     if (!string.IsNullOrWhiteSpace(searchString))
     {
         produseQuery = produseQuery.Where(p => EF.Functions.Like(p.Title, $"%{searchString}%"));
@@ -228,7 +224,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
     ViewBag.lastPage = lastPage;
     ViewBag.CurrentPage = page;
 
-    // Base URL pentru paginare care păstrează filtrele
+    // Base url pentru paginare care pastreaza filtrele
     var baseUrl = Url.Action("Index", "Products", new
     {
         categoriiSelectate = categoriiSelectate,
@@ -260,13 +256,12 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
         });
     }
 
-    //Se "sterge" un produs din shop (soft delete)
+    //Se "sterge" un produs din shop 
     [HttpPost]
     [Authorize(Roles="Editor,Admin")] 
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-        // Important: daca ai QueryFilter pe IsDeleted, folosim IgnoreQueryFilters ca sa gasim produsul sigur
         var product = await db.Products
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(p => p.Id == id);
@@ -278,7 +273,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
 
         var currentUserId = _userManager.GetUserId(User);
 
-        // Admin poate sterge ORICE produs
+        // Admin poate sterge orice produs
         // Editor poate sterge doar produsele proprii
         if (User.IsInRole("Admin") || product.UserId == currentUserId)
         {
@@ -381,7 +376,6 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
             return View(model);
         }
 
-        // LOGICA DE "PATCH"
         if (!string.IsNullOrWhiteSpace(model.Title))
             produs.Title = model.Title;
 

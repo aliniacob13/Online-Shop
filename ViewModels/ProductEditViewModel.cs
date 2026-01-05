@@ -4,7 +4,7 @@ namespace OnlineShop.ViewModels
     {
         public int Id { get; set; }
 
-        // toate optionale, ca sa le poti lasa goale
+        // toate optionale
         public string? Title { get; set; }
         public string? Description { get; set; }
         public decimal? Price { get; set; }

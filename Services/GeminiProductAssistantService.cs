@@ -25,14 +25,12 @@ namespace OnlineShop.Services
             db = context;
             logger = log;
 
-            // 1) ia din .env / environment variable
+            //ia din .env 
             apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
                      ?? throw new ArgumentNullException("GEMINI_API_KEY not configured (missing in .env / environment)");
 
-            // 2) model poate rămâne în appsettings (nu e secret)
             model = config["Gemini:Model"] ?? "gemini-2.5-flash";
 
-            // 3) folosim HttpClient din DI
             http = client;
             http.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
         }
@@ -53,7 +51,7 @@ namespace OnlineShop.Services
                 .Take(30)
                 .ToListAsync();
 
-            // 1) Mai intai, incercam raspuns direct din FAQ (gratis, fara apel AI)
+            //mai intai se incearca un raspuns direct din FAQ 
             var faqPotrivit = GasesteFaqPotrivit(intrebare, faqs);
             if (faqPotrivit != null)
             {
@@ -116,7 +114,7 @@ INTREBARE:
                 if (string.IsNullOrWhiteSpace(raspuns))
                     raspuns = Fallback;
 
-                // Fortam fallback daca modelul a ignorat instructiunile
+                //fortam fallback daca modelul a ignorat instructiunile
                 if (!EsteRaspunsAcceptabil(raspuns))
                     raspuns = Fallback;
 

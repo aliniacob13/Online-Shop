@@ -5,49 +5,130 @@
     int days = (ViewBag.Days ?? 30);
 }
 
-<h2>Top intrebari (ultimele @days zile)</h2>
-
-<form method="get" class="mb-3">
-    <label class="me-2">Perioada (zile):</label>
-    <input type="number" name="days" value="@days" min="1" max="365" class="me-2" />
-    <button class="btn btn-sm btn-secondary" type="submit">Aplica</button>
-</form>
-
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>Produs</th>
-        <th>Intrebare</th>
-        <th>De cate ori</th>
-        <th>Ultima data</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var x in Model)
-    {
-        <tr>
-            <td>@x.ProductTitle (@x.ProductId)</td>
-            <td>@x.Question</td>
-            <td>@x.Count</td>
-            <td>@x.LastAsked.ToString("dd.MM.yyyy HH:mm")</td>
-            <td class="text-end">
-                <a class="btn btn-sm btn-outline-secondary me-2"
-                   asp-controller="AdminProductFaqs"
-                   asp-action="Index"
-                   asp-route-productId="@x.ProductId">
-                    Administreaza FAQ
-                </a>
-
-                <a class="btn btn-sm btn-primary"
-                   asp-controller="AdminProductFaqs"
-                   asp-action="Create"
-                   asp-route-productId="@x.ProductId"
-                   asp-route-question="@x.Question">
-                    Creeaza FAQ din asta
-                </a>
-            </td>
-        </tr>
+<style>
+    .table-apple{
+        margin: 0;
     }
-    </tbody>
-</table>
+    .table-apple thead th{
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0,0,0,.08);
+        padding-top: 14px;
+        padding-bottom: 14px;
+        background: transparent;
+        white-space: nowrap;
+    }
+    .table-apple tbody td{
+        border-top: 1px solid rgba(0,0,0,.06);
+        vertical-align: middle;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+    .table-apple tbody tr:hover{
+        background: rgba(0,0,0,.02);
+    }
+
+    .filters-row{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .75rem;
+    }
+    @@media (min-width: 768px){
+        .filters-row{
+            grid-template-columns: auto 140px auto;
+            align-items: end;
+        }
+    }
+
+    .days-input{
+        width: 140px;
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .55rem;
+        padding-bottom: .55rem;
+    }
+    .days-input:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+        outline: none;
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="mb-3">
+            <h2 class="apple-title mb-1">Top intrebari (ultimele @days zile)</h2>
+            <div class="apple-muted">Cele mai frecvente intrebari din chat, grupate pe produs.</div>
+        </div>
+
+        <div class="surface p-3 mb-3">
+            <form method="get" class="m-0">
+                <div class="filters-row">
+                    <div>
+                        <label class="form-label mb-1">Perioada (zile)</label>
+                        <div class="apple-muted" style="font-size: .9rem;">Alege intre 1 si 365.</div>
+                    </div>
+
+                    <input type="number"
+                           name="days"
+                           value="@days"
+                           min="1"
+                           max="365"
+                           class="form-control days-input" />
+
+                    <div class="d-flex justify-content-md-end">
+                        <button class="btn btn-secondary pill px-4" type="submit">Aplica</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="surface p-2 p-md-3">
+            <div class="table-responsive">
+                <table class="table table-apple align-middle">
+                    <thead>
+                        <tr>
+                            <th>Produs</th>
+                            <th>Intrebare</th>
+                            <th>De cate ori</th>
+                            <th>Ultima data</th>
+                            <th class="text-end">Actiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var x in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @x.ProductTitle <span class="apple-muted">(@x.ProductId)</span>
+                                </td>
+                                <td>@x.Question</td>
+                                <td class="fw-semibold">@x.Count</td>
+                                <td>@x.LastAsked.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex flex-wrap gap-2 justify-content-end">
+                                        <a class="btn btn-sm btn-apple-outline pill px-3"
+                                           asp-controller="AdminProductFaqs"
+                                           asp-action="Index"
+                                           asp-route-productId="@x.ProductId">
+                                            Administreaza FAQ
+                                        </a>
+
+                                        <a class="btn btn-sm btn-apple pill px-3"
+                                           asp-controller="AdminProductFaqs"
+                                           asp-action="Create"
+                                           asp-route-productId="@x.ProductId"
+                                           asp-route-question="@x.Question">
+                                            Creeaza FAQ
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

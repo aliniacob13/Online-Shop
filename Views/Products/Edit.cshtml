@@ -1,73 +1,191 @@
 @model OnlineShop.ViewModels.ProductEditViewModel
 
-<h2 class="text-center mb-4">Editare produs</h2>
+@{
+    ViewData["Title"] = "Editare produs";
+}
 
-<div class="row">
-    <div class="col-md-6 offset-md-3">
+<style>
+    :root{
+        --apple-bg: #f5f5f7;
+        --apple-surface: #ffffff;
+        --apple-text: #1d1d1f;
+        --apple-muted: #6e6e73;
+        --apple-border: rgba(0,0,0,.10);
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-radius: 18px;
+        --apple-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
 
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    .apple-admin{
+        background: var(--apple-bg);
+        min-height: calc(100vh - 56px);
+    }
 
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <input type="hidden" asp-for="Id" />
+    .apple-wrap{ max-width: 920px; }
+    .apple-title{ letter-spacing: -0.02em; }
+    .apple-muted{ color: var(--apple-muted); }
 
-            <div class="form-group mb-3">
-                <label asp-for="Title" class="form-label">Denumire Produs</label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+    .surface{
+        background: var(--apple-surface);
+        border: 1px solid var(--apple-border);
+        border-radius: var(--apple-radius);
+        box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
 
-            <div class="form-group mb-3">
-                <label asp-for="Description" class="form-label">Descriere Produs</label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+    .pill{ border-radius: 999px; }
 
-            <div class="form-group mb-3">
-                <label asp-for="Price" class="form-label">Pret Produs</label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
+    .btn-apple{
+        background: var(--apple-blue);
+        border-color: var(--apple-blue);
+        color: #fff;
+    }
+    .btn-apple:hover{
+        background: var(--apple-blue-hover);
+        border-color: var(--apple-blue-hover);
+        color: #fff;
+    }
 
-            <div class="form-group mb-3">
-                <label asp-for="Stock" class="form-label">Stoc</label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
+    .btn-apple-outline{
+        border-color: rgba(0,0,0,.18);
+        color: var(--apple-text);
+        background: #fff;
+    }
+    .btn-apple-outline:hover{
+        background: rgba(0,0,0,.04);
+        border-color: rgba(0,0,0,.22);
+        color: var(--apple-text);
+    }
 
-            <div class="form-group mb-3">
-                <label asp-for="CategoryId" class="form-label">Selectati categoria</label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
-                    <option value="">-- Selectati categoria --</option>
-                </select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
+    .form-label{
+        font-weight: 600;
+        color: var(--apple-text);
+    }
 
-            <div class="form-group mb-3">
-                <label class="form-label">Imagine curenta</label><br />
-                @if (!string.IsNullOrEmpty(Model.ImageUrlCurenta))
-                {
-                    <img src="@Model.ImageUrlCurenta" alt="Imagine produs"
-                         style="max-width: 200px; max-height: 200px" />
-                }
-                else
-                {
-                    <p>(Nu exista imagine salvata)</p>
-                }
-            </div>
+    .form-control, .form-select{
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .form-control:focus, .form-select:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+    }
 
-            <div class="form-group mb-4">
-                <label asp-for="ImagineNoua" class="form-label">Incarca imagine noua (optional)</label>
-                <input asp-for="ImagineNoua" type="file" class="form-control" />
-                <span asp-validation-for="ImagineNoua" class="text-danger"></span>
-            </div>
+    .hint{
+        font-size: .875rem;
+        color: var(--apple-muted);
+    }
 
-            <button type="submit" class="btn btn-success w-100">
-                Modifica produs
-            </button>
-        </form>
+    .img-frame{
+        border: 1px solid rgba(0,0,0,.08);
+        border-radius: 16px;
+        background: #fff;
+        padding: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .img-frame img{
+        max-width: 220px;
+        max-height: 220px;
+        border-radius: 12px;
+        display: block;
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="mb-3">
+            <h2 class="apple-title mb-1 text-center">Editare produs</h2>
+            <div class="apple-muted text-center">Actualizează detaliile produsului și, opțional, imaginea.</div>
+        </div>
+
+        <div class="surface p-3 p-md-4">
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Denumire Produs</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Descriere Produs</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label">Pret Produs</label>
+                            <input asp-for="Price" type="number" step="0.01" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Stock" class="form-label">Stoc</label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label">Selectati categoria</label>
+                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                        <option value="">-- Selectati categoria --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Imagine curenta</label>
+                    <div class="mt-2">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrlCurenta))
+                        {
+                            <div class="img-frame">
+                                <img src="@Model.ImageUrlCurenta" alt="Imagine produs" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="hint">(Nu exista imagine salvata)</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="ImagineNoua" class="form-label">Incarca imagine noua (optional)</label>
+                    <input asp-for="ImagineNoua" type="file" class="form-control" />
+                    <div class="hint mt-1">Dacă încarci o imagine nouă, va înlocui imaginea curentă.</div>
+                    <span asp-validation-for="ImagineNoua" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                    <button type="submit" class="btn btn-apple pill px-4 w-100">
+                        Modifica produs
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-apple-outline pill px-4 w-100">
+                        Inapoi la lista
+                    </a>
+                </div>
+            </form>
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

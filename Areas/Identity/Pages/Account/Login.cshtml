@@ -1,0 +1,117 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<style>
+    .auth-wrap{ max-width: 980px; }
+    .auth-card{
+        border: 1px solid rgba(0,0,0,.10);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 12px 40px rgba(0,0,0,.08);
+    }
+    .auth-title{
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+    .auth-subtitle{
+        color: var(--apple-muted);
+        margin-top: 6px;
+    }
+    .auth-links a{
+        color: var(--apple-text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .auth-links a:hover{
+        color: var(--apple-blue);
+    }
+
+    .form-control{
+        border-radius: 14px;
+        border-color: rgba(0,0,0,.12);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .form-control:focus{
+        border-color: rgba(0,113,227,.55);
+        box-shadow: 0 0 0 .25rem rgba(0,113,227,.12);
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 auth-wrap">
+
+        <div class="mb-3">
+            <h1 class="auth-title">@ViewData["Title"]</h1>
+            <div class="auth-subtitle">Autentifică-te ca sa ai acces la wishlist, comenzi și la coșul de cumpărături.</div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="auth-card p-3 p-md-4">
+                    <section>
+                        <form id="account" method="post">
+                            <h2 class="h5 fw-bold mb-3">Loghează-te</h2>
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Email" class="form-label">Email</label>
+                                <input asp-for="Input.Email"
+                                       class="form-control"
+                                       autocomplete="username"
+                                       aria-required="true"
+                                       placeholder="name@example.com" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Password" class="form-label">Parolă</label>
+                                <input asp-for="Input.Password"
+                                       class="form-control"
+                                       autocomplete="current-password"
+                                       aria-required="true"
+                                       placeholder="password" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" asp-for="Input.RememberMe" />
+                                <label asp-for="Input.RememberMe" class="form-check-label">
+                                    @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                </label>
+                            </div>
+
+                            <div class="mt-3">
+                                <button id="login-submit" type="submit" class="w-100 btn btn-apple pill py-2">
+                                    Log in
+                                </button>
+                            </div>
+
+                            <div class="auth-links mt-3">
+                                <p class="mb-2">
+                                    <a id="forgot-password" asp-page="./ForgotPassword">Ți-ai uitat parola?</a>
+                                </p>
+                                <p class="mb-2">
+                                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Înregistrează-te</a>
+                                </p>
+                                <p class="mb-0">
+                                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Retrimite email-ul de confirmare</a>
+                                </p>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

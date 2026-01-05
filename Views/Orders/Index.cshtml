@@ -4,64 +4,116 @@
     ViewData["Title"] = "Comenzile mele";
 }
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<style>
+    .order-card{
+        border: 1px solid rgba(0,0,0,.08);
+        border-radius: 18px;
+        background: #fff;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .order-card:hover{
+        transform: translateY(-2px);
+        box-shadow: var(--apple-shadow);
+    }
 
-<h2 class="my-4 text-center fw-bold">Comenzile Mele</h2>
+    .order-badge{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0,113,227,.10);
+        border: 1px solid rgba(0,113,227,.18);
+        color: var(--apple-text);
+        font-weight: 700;
+    }
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info text-center fs-5">
-        Nu ai plasat nicio comandă încă.
-    </div>
-}
-else
-{
-    <div class="row g-4">
+    .item-row{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .item-row:last-child{
+        border-bottom: none;
+    }
 
-        @foreach (var order in Model)
+    .item-img{
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,.08);
+        background: #fff;
+        flex: 0 0 auto;
+    }
+
+    .total-row{
+        border-top: 1px solid rgba(0,0,0,.08);
+        padding-top: 12px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="apple-admin">
+    <div class="container py-4 apple-wrap">
+
+        <div class="mb-3 text-center">
+            <h2 class="apple-title mb-1">Comenzile Mele</h2>
+        </div>
+
+        @if (!Model.Any())
         {
-            var total = order.OrderItems.Sum(i => i.UnitPriceAtPurchase * i.Quantity);
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 rounded-4">
-                    <div class="card-body">
-
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge bg-primary px-3 py-2">Comanda #@order.Id</span>
-                            <small class="text-muted">@order.OrderDate.ToString("dd MMM yyyy")</small>
-                        </div>
-
-                        <hr />
-
-                        <h5 class="fw-bold mb-3">Produse</h5>
-
-                        <ul class="list-unstyled">
-                            @foreach (var item in order.OrderItems)
-                            {
-                                <li class="d-flex align-items-center mb-3">
-                                    <img src="@item.ImageUrlAtPurchase"
-                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 10px;"
-                                         class="me-3" />
-
-                                    <div>
-                                        <div class="fw-semibold">@item.ProductTitleAtPurchase</div>
-                                        <div class="text-muted small">
-                                            @item.Quantity x @item.UnitPriceAtPurchase lei
-                                        </div>
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-
-                        <hr />
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold fs-5">Total:</span>
-                            <span class="fw-bold fs-4 text-success">@total lei</span>
-                        </div>
-
-                    </div>
-                </div>
+            <div class="surface p-4 text-center apple-muted" style="font-size: 1.05rem;">
+                Nu ai plasat nicio comandă încă.
             </div>
         }
+        else
+        {
+            <div class="row g-3 g-md-4">
+                @foreach (var order in Model)
+                {
+                    var total = order.OrderItems.Sum(i => i.UnitPriceAtPurchase * i.Quantity);
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="order-card p-3 p-md-4 h-100">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="order-badge">Comanda #@order.Id</span>
+                                <div class="apple-muted small">@order.OrderDate.ToString("dd MMM yyyy")</div>
+                            </div>
+
+                            <div class="apple-muted fw-semibold mb-2">Produse</div>
+
+                            <div>
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    <div class="item-row">
+                                        <img src="@item.ImageUrlAtPurchase" class="item-img" alt="@item.ProductTitleAtPurchase" />
+
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@item.ProductTitleAtPurchase</div>
+                                            <div class="apple-muted small">
+                                                @item.Quantity x @item.UnitPriceAtPurchase lei
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="total-row d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold">Total</span>
+                                <span class="fw-bold" style="font-size: 1.35rem; color: #198754;">
+                                    @total lei
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
     </div>
-}
+</div>
