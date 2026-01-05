@@ -4,6 +4,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8-00758F?style=for-the-badge&logo=mysql&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-0D6EFD?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![C%23](https://img.shields.io/badge/C%23-10-0EA5E9?style=for-the-badge&logo=csharp&logoColor=white)
+</br>
 Un online shop pentru produse Apple, cu UI minimalist inspirat de cultura celor de la Apple, construit în **ASP.NET Core MVC**. Aplicația include autentificare cu roluri, coș, wishlist, comenzi, review-uri și un “Product Assistant” cu logare de întrebări și FAQ.
 
 **Studenți:** Alin-Ovidiu Iacob, Eva-Cristiana Diaconescu  
@@ -80,9 +81,8 @@ OnlineShop simulează experiența unui magazin online modern pentru produse Appl
 
 ---
 
-## Cum rulezi proiectul local
-
-### Cerințe
+### Cerințe Minime
 - .NET 9 SDK 
 - EF Core Tools
 - MySql/SqlServer
+- Rider/Visual Studio
