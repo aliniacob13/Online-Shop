@@ -1,8 +1,11 @@
-@model IEnumerable<OnlineShop.Controllers.AdminTopQuestionsController.TopQVm>
-
+@model IEnumerable<OnlineShop.ViewModels.AdminTopQuestions.TopQVm>
 @{
     ViewData["Title"] = "Top intrebari";
     int days = (ViewBag.Days ?? 30);
+
+    int lastPage = ViewBag.lastPage ?? 1;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    string paginationBaseUrl = ViewBag.PaginationBaseUrl as string ?? "/AdminTopQuestions/Index?page=";
 }
 
 <style>
@@ -76,6 +79,8 @@
                            max="365"
                            class="form-control days-input" />
 
+                    <input type="hidden" name="page" value="1" />
+
                     <div class="d-flex justify-content-md-end">
                         <button class="btn btn-secondary pill px-4" type="submit">Aplica</button>
                     </div>
@@ -128,6 +133,30 @@
                     </tbody>
                 </table>
             </div>
+
+            <nav class="mt-3" aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link" href="@(paginationBaseUrl + (currentPage - 1))" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int p = 1; p <= lastPage; p++)
+                    {
+                        <li class="page-item @(p == currentPage ? "active" : "")">
+                            <a class="page-link" href="@(paginationBaseUrl + p)">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(currentPage >= lastPage ? "disabled" : "")">
+                        <a class="page-link" href="@(paginationBaseUrl + (currentPage + 1))" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
         </div>
 
     </div>

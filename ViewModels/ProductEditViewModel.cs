@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 namespace OnlineShop.ViewModels
 {
     public class ProductEditViewModel
@@ -7,7 +9,11 @@ namespace OnlineShop.ViewModels
         // toate optionale
         public string? Title { get; set; }
         public string? Description { get; set; }
+        
+        [Range(0.01, double.MaxValue, ErrorMessage = "Prețul trebuie să fie mai mare decât 0.")]
         public decimal? Price { get; set; }
+        
+        [Range(0, int.MaxValue, ErrorMessage = "Stocul nu poate fi negativ.")]
         public int? Stock { get; set; }
         public int? CategoryId { get; set; }
 

@@ -183,29 +183,44 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
 
     // Sortare pret
     // Sortare (pret / rating)
+    // Sortare: intai cele in stoc, apoi cele fara stoc (Stock == 0)
     if (sortarePret == "pret_crescator")
     {
-        produseQuery = produseQuery.OrderBy(p => p.Price).ThenBy(p => p.Id);
+        produseQuery = produseQuery
+            .OrderBy(p => p.Stock == 0)
+            .ThenBy(p => p.Price)
+            .ThenBy(p => p.Id);
     }
     else if (sortarePret == "pret_descrescator")
     {
-        produseQuery = produseQuery.OrderByDescending(p => p.Price).ThenBy(p => p.Id);
+        produseQuery = produseQuery
+            .OrderBy(p => p.Stock == 0)
+            .ThenByDescending(p => p.Price)
+            .ThenBy(p => p.Id);
     }
     else if (sortarePret == "rating_crescator")
     {
         produseQuery = produseQuery
-            .OrderBy(p => p.Reviews.Where(r => r.Rating.HasValue).Select(r => (double?)r.Rating.Value).Average() ?? 0)
+            .OrderBy(p => p.Stock == 0)
+            .ThenBy(p => p.Reviews.Where(r => r.Rating.HasValue)
+                .Select(r => (double?)r.Rating!.Value)
+                .Average() ?? 0)
             .ThenBy(p => p.Id);
     }
     else if (sortarePret == "rating_descrescator")
     {
         produseQuery = produseQuery
-            .OrderByDescending(p => p.Reviews.Where(r => r.Rating.HasValue).Select(r => (double?)r.Rating.Value).Average() ?? 0)
+            .OrderBy(p => p.Stock == 0)
+            .ThenByDescending(p => p.Reviews.Where(r => r.Rating.HasValue)
+                .Select(r => (double?)r.Rating!.Value)
+                .Average() ?? 0)
             .ThenBy(p => p.Id);
     }
     else
     {
-        produseQuery = produseQuery.OrderBy(p => p.Id);
+        produseQuery = produseQuery
+            .OrderBy(p => p.Stock == 0)
+            .ThenBy(p => p.Id);
     }
 
     // Paginare
@@ -369,7 +384,12 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         {
             ModelState.AddModelError("CategoryId", "Selectati o categorie");
         }
-
+        
+        if (model.Price.HasValue && model.Price.Value <= 0)
+        {
+            ModelState.AddModelError(nameof(model.Price), "Prețul trebuie să fie mai mare decât 0.");
+        }
+        
         if (!ModelState.IsValid)
         {
             ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", model.CategoryId);

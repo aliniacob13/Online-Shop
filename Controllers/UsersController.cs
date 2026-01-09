@@ -27,14 +27,64 @@ namespace OnlineShop.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index(string? email)
+        public async Task<IActionResult> Index(string? email, List<string>? roluriSelectate, int page = 1)
         {
-            var users = FiltreazaUseriDupaEmail(email)
-                .OrderBy(u => u.UserName)
-                .ToList();
+            int perPage = 6;
+            if (page < 1) page = 1;
 
-            ViewBag.UsersList = users;
+            roluriSelectate ??= new List<string>();
+
+            var roluriDisponibile = new List<string> { "Admin", "Editor", "User" };
+            ViewBag.RoluriDisponibile = roluriDisponibile;
+            ViewBag.RoluriSelectate = roluriSelectate;
+
             ViewBag.EmailSearch = email ?? "";
+
+            var usersQuery = FiltreazaUseriDupaEmail(email).AsQueryable();
+
+            if (roluriSelectate.Any())
+            {
+                var userIdsCuRol = db.UserRoles
+                    .Join(db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new { ur.UserId, Rol = r.Name })
+                    .Where(x => x.Rol != null && roluriSelectate.Contains(x.Rol))
+                    .Select(x => x.UserId)
+                    .Distinct();
+
+                usersQuery = db.Users.Where(u => userIdsCuRol.Contains(u.Id));
+            }
+
+            usersQuery = usersQuery.OrderBy(u => u.UserName);
+
+            // Paginare
+            int totalItems = await usersQuery.CountAsync();
+            int lastPage = (int)Math.Ceiling(totalItems / (double)perPage);
+            if (lastPage < 1) lastPage = 1;
+            if (page > lastPage) page = lastPage;
+
+            int offset = (page - 1) * perPage;
+
+            var usersPagina = await usersQuery
+                .Skip(offset)
+                .Take(perPage)
+                .ToListAsync();
+
+            ViewBag.UsersList = usersPagina;
+            ViewBag.lastPage = lastPage;
+            ViewBag.CurrentPage = page;
+
+            // Base url pentru paginare care pastreaza filtrele (ca la produse)
+            var baseUrl = Url.Action("Index", "Users", new
+            {
+                email = email,
+                roluriSelectate = roluriSelectate
+            }) ?? "/Users/Index";
+
+            var separator = baseUrl.Contains("?") ? "&" : "?";
+            ViewBag.PaginationBaseUrl = baseUrl + separator + "page=";
+
             return View();
         }
 
