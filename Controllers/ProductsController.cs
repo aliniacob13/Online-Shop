@@ -382,12 +382,22 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         {
             ModelState.AddModelError("CategoryId", "Selectati o categorie");
         }
-        
+
         if (model.Price.HasValue && model.Price.Value <= 0)
         {
             ModelState.AddModelError(nameof(model.Price), "Prețul trebuie să fie mai mare decât 0.");
         }
-        
+
+        if (string.IsNullOrWhiteSpace(model.Title))
+        {
+            ModelState.Remove(nameof(model.Title));
+        }
+        else
+        {
+            if (model.Title.Trim().Length < 5)
+                ModelState.AddModelError(nameof(model.Title), "Titlul trebuie să aibă minim 5 caractere.");
+        }
+
         if (!ModelState.IsValid)
         {
             ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", model.CategoryId);
