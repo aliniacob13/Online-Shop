@@ -22,7 +22,7 @@ namespace OnlineShop.Controllers
             _userManager = userManager;
         }
 
-        // --- Afisare cart ---
+        //afisare cart
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
@@ -33,7 +33,7 @@ namespace OnlineShop.Controllers
             return View(cartItems);
         }
 
-        // --- Adauga produs in cart (apelata prin POST cand userul este deja logat) ---
+        //adauga produs in cart (apelata prin POST cand userul este deja logat)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId, int quantity = 1)

@@ -35,8 +35,7 @@ public class ProductsController : Controller
     [Authorize(Roles="Editor,Admin")]
     public IActionResult Create()
     {
-        // Trebuie să trimitem lista de categorii către View pentru a popula Dropdown-ul
-        // SelectList are 3 argumente: Lista sursă, Ce salvăm (Id), Ce afișăm (Name)
+        // trebuie sa trimitem lista de categorii catre View pentru a popula Dropdown-ul
         ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name");
         
         return View();
@@ -45,7 +44,7 @@ public class ProductsController : Controller
     [Authorize(Roles="Editor,Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    // Primim obiectul Product SI fișierul separat (IFormFile imageFile)
+    // primim obiectul Product si fișierul separat (IFormFile imageFile)
     public async Task<IActionResult> Create(Product product, IFormFile? imageFile)
     {
         if (imageFile == null || imageFile.Length == 0)
@@ -54,7 +53,7 @@ public class ProductsController : Controller
         }
         else
         {
-            // Verificam extensia (să fie doar imagine)
+            //verificam extensia(sa fie doar imagine)
             ModelState.Remove("ImageUrl");
             string extension = Path.GetExtension(imageFile.FileName).ToLower();
             string[] permittedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
@@ -64,15 +63,15 @@ public class ProductsController : Controller
                 ModelState.AddModelError("ImageUrl", "Format invalid. Doar .jpg, .jpeg, .png, .gif sunt acceptate.");
             }
 
-            // Verificăm dimensiunea 
+            //verificam dimensiunea 
             if (imageFile.Length > 5 * 1024 * 1024) 
             {
                  ModelState.AddModelError("ImageUrl", "Imaginea este prea mare. Maxim 5MB.");
             }
         }
 
-        // Deoarece Category este null (vine doar CategoryId din form), 
-        // trebuie sa scoatem eroarea de validare automată pentru obiectul Category
+        //pentru ca Category este null(vine doar CategoryId din form), 
+        //trebuie sa scoatem eroarea de validare automată pentru obiectul Category
         ModelState.Remove("Category"); 
         product.UserId = _userManager.GetUserId(User);
 
@@ -94,10 +93,10 @@ public class ProductsController : Controller
         if (ModelState.IsValid)
         {
             
-            // Generam un nume unic fisierului pentru a evita duplicatele
+            //nume unic fisierului pentru a evita duplicatele
             string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
             
-            // Compunem calea unde o salvăm: wwwroot/images
+            //compunem calea unde o salvam: wwwroot/images
             string uploadsFolder = Path.Combine(whe.WebRootPath, "images");
             
             if (!Directory.Exists(uploadsFolder))
@@ -107,15 +106,15 @@ public class ProductsController : Controller
 
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // Copiem fisierul primit in calea definita
+            //copiem fisierul primit in calea definita
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(fileStream);
             }
 
-            //Salvare in baza de date
+            //salvare in baza de date
             
-            // doar calea relativă în obiectul produs
+            //doar calea relativa în obiectul produs
             product.ImageUrl = "/images/" + uniqueFileName;
 
             db.Add(product);
@@ -147,7 +146,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
     int perPage = 6;
     if (page < 1) page = 1;
 
-    // Lista de categorii pentru sidebar
+    //lista de categorii pentru sidebar
     var categorii = await db.Categories
         .OrderBy(c => c.Name)
         .ToListAsync();
@@ -164,7 +163,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
         .Include(p => p.Reviews)
         .AsQueryable();
 
-    // Filtru multi-categorii
+    //multi-categorii
     if (categoriiSelectate.Any())
     {
         produseQuery = produseQuery.Where(p => categoriiSelectate.Contains(p.CategoryId));
@@ -175,15 +174,15 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
         ViewBag.CategoryName = "Toate produsele";
     }
 
-    // Cautare
+    //cautare
     if (!string.IsNullOrWhiteSpace(searchString))
     {
         produseQuery = produseQuery.Where(p => EF.Functions.Like(p.Title, $"%{searchString}%"));
     }
 
-    // Sortare pret
-    // Sortare (pret / rating)
-    // Sortare: intai cele in stoc, apoi cele fara stoc (Stock == 0)
+    //sortare pret
+    //sortare(pret / rating)
+    //sortare: intai cele in stoc, apoi cele fara stoc (Stock == 0)
     if (sortarePret == "pret_crescator")
     {
         produseQuery = produseQuery
@@ -223,7 +222,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
             .ThenBy(p => p.Id);
     }
 
-    // Paginare
+    //paginare
     int totalItems = await produseQuery.CountAsync();
     int lastPage = (int)Math.Ceiling(totalItems / (double)perPage);
     if (lastPage < 1) lastPage = 1;
@@ -239,7 +238,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
     ViewBag.lastPage = lastPage;
     ViewBag.CurrentPage = page;
 
-    // Base url pentru paginare care pastreaza filtrele
+    //base url pentru paginare care pastreaza filtrele
     var baseUrl = Url.Action("Index", "Products", new
     {
         categoriiSelectate = categoriiSelectate,
@@ -271,7 +270,7 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
         });
     }
 
-    //Se "sterge" un produs din shop 
+    //se "sterge" un produs din shop 
     [HttpPost]
     [Authorize(Roles="Editor,Admin")] 
     [ValidateAntiForgeryToken]
@@ -288,11 +287,11 @@ public async Task<IActionResult> Index(List<int>? categoriiSelectate, string? se
 
         var currentUserId = _userManager.GetUserId(User);
 
-        // Admin poate sterge orice produs
-        // Editor poate sterge doar produsele proprii
+        //admin poate sterge orice produs
+        //editor poate sterge doar produsele proprii
         if (User.IsInRole("Admin") || product.UserId == currentUserId)
         {
-            // daca e deja sters, nu mai facem nimic
+            //daca e deja sters, nu mai facem nimic
             if (!product.IsDeleted)
             {
                 product.IsDeleted = true;
@@ -376,10 +375,9 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         return NotFound();
     }
 
-    // verificare drepturi: proprietar sau admin
+    //verificare drepturi: proprietar sau admin
     if (produs.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
     {
-        // validare minima: categoria obligatorie daca vrei sa impui asta la edit
         if (model.CategoryId == null)
         {
             ModelState.AddModelError("CategoryId", "Selectati o categorie");
@@ -411,7 +409,7 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         if (model.CategoryId.HasValue)
             produs.CategoryId = model.CategoryId.Value;
 
-        // Imagine noua optionala
+        //imagine noua optionala
         if (model.ImagineNoua != null && model.ImagineNoua.Length > 0)
         {
             string extensie = Path.GetExtension(model.ImagineNoua.FileName).ToLower();
@@ -487,7 +485,7 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         return NotFound();
     }
 
-    // Media rating pentru produs (doar reviewuri cu Rating setat)
+    //media rating pentru produs (doar reviewuri cu Rating setat)
     double? avgRating = null;
     if (produs.Reviews != null && produs.Reviews.Any(r => r.Rating.HasValue))
     {
@@ -497,7 +495,7 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
     }
     ViewBag.AverageRating = avgRating;
 
-    // poate userul curent sa lase review?
+    //daca poate userul curent sa lase review
     bool canReview = false;
     if (User.Identity != null && User.Identity.IsAuthenticated)
     {

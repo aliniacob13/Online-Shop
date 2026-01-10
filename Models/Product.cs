@@ -16,7 +16,7 @@ public class Product
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Titlul produsului este obligatoriu.")]
-    [StringLength(100)]
+    [StringLength(100, MinimumLength = 5, ErrorMessage = "Titlul trebuie să aibă între 5 și 100 de caractere.")]
     public string Title { get; set; }
 
     [Required(ErrorMessage = "Descrierea este obligatorie.")]
