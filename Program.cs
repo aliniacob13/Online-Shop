@@ -48,7 +48,6 @@ builder.Services.AddScoped<IProductAssistantService, GeminiProductAssistantServi
 
 var app = builder.Build();
 
-// PASUL 5 - useri si roluri
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -68,7 +67,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//imp pentru Identity
 app.UseAuthentication();
 app.UseAuthorization();
 
