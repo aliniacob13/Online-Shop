@@ -39,7 +39,7 @@ namespace OnlineShop.Data
             modelBuilder.Entity<Product>()
                 .HasQueryFilter(p => !p.IsDeleted);
 
-            // Protectie istoric comenzi: nu sterge OrderItem cand se sterge Product
+            // Protectie istoric comenzi: nu se sterge OrderItem cand se sterge Product
             modelBuilder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
                 .WithMany()
@@ -65,7 +65,7 @@ namespace OnlineShop.Data
 
 
 
-            //configurez WishlistItem sa fie unic per User + Product
+            //WishlistItem sa fie unic per User + Product
             modelBuilder.Entity<WishlistItem>()
                 .HasIndex(w => new { w.UserId, w.ProductId })
                 .IsUnique();

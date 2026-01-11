@@ -495,7 +495,6 @@ public async Task<IActionResult> Edit(ProductEditViewModel model)
         return NotFound();
     }
 
-    //media rating pentru produs (doar reviewuri cu Rating setat)
     double? avgRating = null;
     if (produs.Reviews != null && produs.Reviews.Any(r => r.Rating.HasValue))
     {

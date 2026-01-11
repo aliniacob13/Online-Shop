@@ -165,7 +165,6 @@ namespace OnlineShop.Controllers
                     }
                 }
 
-                // 3) recomandat: sterge din cos/wishlist produsele scoase din shop
                 var productIds = category.Products.Select(p => p.Id).ToList();
 
                 var cartToRemove = db.CartItems.Where(ci => productIds.Contains(ci.ProductId)).ToList();
@@ -185,7 +184,6 @@ namespace OnlineShop.Controllers
             return RedirectToAction("Index");
         }
 
-        // Optional: Show ramane public
         public ActionResult Show(int id)
         {
             var category = db.Categories.Find(id);
